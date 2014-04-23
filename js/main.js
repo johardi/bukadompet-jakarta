@@ -11,9 +11,9 @@ var COS = {
       type : "string",
       // Handling inconsistency data for urusan code.
       before : function(v) {
-	     if (v == '1.1') { return "1.10"; }
-	     else if (v == '1.2') { return "1.20"; }
-	     else return v;
+         if (v == '1.1') { return "1.10"; }
+         else if (v == '1.2') { return "1.20"; }
+         else return v;
       }
    }, {
       name : "namaUrusan",
@@ -76,36 +76,36 @@ var COS = {
                { code : "1.01", name : "Pendidikan" },
                { code : "1.02", name : "Kesehatan" },
                { code : "1.03", name : "Pekerjaan Umum" },
-			   { code : "1.04", name : "Perumahan Rakyat" },
-			   { code : "1.05", name : "Penataan Ruang" },
-			   { code : "1.06", name : "Perencanaan Pembangunan" },
-			   { code : "1.07", name : "Perhubungan" },
-			   { code : "1.08", name : "Lingkungan Hidup" },
-			   { code : "1.09", name : "Pertahanan" },
-			   { code : "1.10", name : "Kependudukan dan Catatan Sipil" },
-			   { code : "1.11", name : "Pemberdayaan Perempuan dan Perlindungan Anak" },
-			   { code : "1.12", name : "Keluarga Berencana dan Keluarga Sejahtera" },
-			   { code : "1.13", name : "Sosial" },
-			   { code : "1.14", name : "Ketenagakerjaan" },
-			   { code : "1.15", name : "Koperasi dan Usaha Kecil Menengah" },
-			   { code : "1.16", name : "Penanaman Modal" },
-			   { code : "1.17", name : "Kebudayaan" },
-			   { code : "1.18", name : "Pemuda dan Olahraga" },
-			   { code : "1.19", name : "Kesatuan Bangsa dan Politik Dalam Negeri" },
-			   { code : "1.20", name : "Otonomi Daerah dan Administrasi Daerah" },
-			   { code : "1.21", name : "Ketahanan Pangan" },
-			   { code : "1.22", name : "Pemberdayaan Masyarakat dan Desa (RW)" },
-			   { code : "1.23", name : "Statistik" },
-			   { code : "1.24", name : "Kearsipan" },
-			   { code : "1.25", name : "Komunikasi dan Informatika" },
-			   { code : "1.26", name : "Perpustakaan" },
-			   { code : "2.01", name : "Pertanian" },
-			   { code : "2.02", name : "Kehutanan" },
-			   { code : "2.03", name : "Energi dan Sumber Daya Mineral" },
-			   { code : "2.04", name : "Pariwisata" },
-			   { code : "2.05", name : "Perikanan, Kelautan dan Peternakan" },
-			   { code : "2.06", name : "Perdagangan" },
-			   { code : "2.07", name : "Industri" }
+               { code : "1.04", name : "Perumahan Rakyat" },
+               { code : "1.05", name : "Penataan Ruang" },
+               { code : "1.06", name : "Perencanaan Pembangunan" },
+               { code : "1.07", name : "Perhubungan" },
+               { code : "1.08", name : "Lingkungan Hidup" },
+               { code : "1.09", name : "Pertahanan" },
+               { code : "1.10", name : "Kependudukan dan Catatan Sipil" },
+               { code : "1.11", name : "Pemberdayaan Perempuan dan Perlindungan Anak" },
+               { code : "1.12", name : "Keluarga Berencana dan Keluarga Sejahtera" },
+               { code : "1.13", name : "Sosial" },
+               { code : "1.14", name : "Ketenagakerjaan" },
+               { code : "1.15", name : "Koperasi dan Usaha Kecil Menengah" },
+               { code : "1.16", name : "Penanaman Modal" },
+               { code : "1.17", name : "Kebudayaan" },
+               { code : "1.18", name : "Pemuda dan Olahraga" },
+               { code : "1.19", name : "Kesatuan Bangsa dan Politik Dalam Negeri" },
+               { code : "1.20", name : "Otonomi Daerah dan Administrasi Daerah" },
+               { code : "1.21", name : "Ketahanan Pangan" },
+               { code : "1.22", name : "Pemberdayaan Masyarakat dan Desa (RW)" },
+               { code : "1.23", name : "Statistik" },
+               { code : "1.24", name : "Kearsipan" },
+               { code : "1.25", name : "Komunikasi dan Informatika" },
+               { code : "1.26", name : "Perpustakaan" },
+               { code : "2.01", name : "Pertanian" },
+               { code : "2.02", name : "Kehutanan" },
+               { code : "2.03", name : "Energi dan Sumber Daya Mineral" },
+               { code : "2.04", name : "Pariwisata" },
+               { code : "2.05", name : "Perikanan, Kelautan dan Peternakan" },
+               { code : "2.06", name : "Perdagangan" },
+               { code : "2.07", name : "Industri" }
             ],
 
             // Define which columns the data can be grouped by: "namaProgram"
@@ -135,16 +135,16 @@ var COS = {
 
          // Define the underlying dataset for this interactive diagram.
          COS.data = new Miso.Dataset(
-	     {
+         {
             // url : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome&page=20&per_page=500",
-			// url : "data/data230.json",
-			url : "data/apbd-jakarta.json",
+            // url : "data/data230.json",
+            url : "data/apbd-jakarta.json",
             columns : COS.columns,
             parser : COS.ResultParser,
          });
 
          COS.data.fetch(
-	     {
+         {
             success : function() {
                COS.app = new COS.Views.Main();
                COS.app.render();
@@ -186,8 +186,8 @@ _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
          dataColumns.SKPDNama.push(c.SKPDNama);
          dataColumns.urusan.push(c.urusan);
          dataColumns.namaUrusan.push(c.namaUrusan);
-	     dataColumns.program.push(c.program);
-	     dataColumns.programKode.push(c.programKode);
+         dataColumns.program.push(c.program);
+         dataColumns.programKode.push(c.programKode);
          dataColumns.namaProgram.push(c.namaProgram);
          dataColumns.kegiatanId.push(c.kegiatanId);
          dataColumns.namaKegiatan.push(c.namaKegiatan);
@@ -233,7 +233,7 @@ COS.Views.Title = Backbone.View.extend(
    initialize : function(options)
    {
       options = options || {};
-      this.defaultMessage = "Anggaran Belanja DKI Jakarta";
+      this.defaultMessage = "Anggaran Belanja Daerah DKI Jakarta";
       this.message = options.message || this.defaultMessage;
       this.setElement($(this.el));
    },
@@ -271,7 +271,7 @@ COS.Views.RegionSelection = Backbone.View.extend(
 
    render : function()
    {
-	  this.$el.addClass('dropdown');
+      this.$el.addClass('dropdown');
       this.$el.parent().show();
       this.$el.html(this.template({
          selections : this.regions
@@ -306,7 +306,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
 
    render : function()
    {
-	  this.$el.addClass('dropdown');
+      this.$el.addClass('dropdown');
       this.$el.parent().show();
       this.$el.html(this.template({
          selections : this.sectors
@@ -345,7 +345,7 @@ COS.Views.YearPeriod = Backbone.View.extend({
 
    render : function()
    {
-	  this.$el.addClass('dropdown');
+      this.$el.addClass('dropdown');
       this.$el.parent().show();
       this.$el.html(this.template({
          yearPeriods : this.periods
@@ -454,18 +454,18 @@ COS.Views.Treemap = Backbone.View.extend(
       // var m_width = $("#chart").width();
       // 
       // var chart = d3.select("#chart").append("svg")
-      // 	       .attr("preserveAspectRatio", "xMidYMid")
-      // 	       .attr("viewBox", "0 0 " + this.width + " " + this.height)
-      // 	       .attr("width", m_width)
-      // 	       .attr("height", m_width * this.height / this.width).append("div")
+      //           .attr("preserveAspectRatio", "xMidYMid")
+      //           .attr("viewBox", "0 0 " + this.width + " " + this.height)
+      //           .attr("width", m_width)
+      //           .attr("height", m_width * this.height / this.width).append("div")
 
 
       var chart = d3.select("#chart").append("div")
-		
+        
       // set default styles for chart
       .call(function() {
                this.attr("class", "chart")
-			       .style("position", "relative");
+                   .style("position", "relative");
             });
 
       // set up data for the chart
@@ -581,7 +581,7 @@ COS.Utils = {
 
       // How are we selecting rows from the dataset
       dataSlice = function(row) {
-	     var regionRegex = new RegExp(region);
+         var regionRegex = new RegExp(region);
          return (regionRegex.test(row["SKPDNama"])) && (row["urusan"] === sector) && (row["year"] == period);
       };
 

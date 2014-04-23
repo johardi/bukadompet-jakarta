@@ -4,6 +4,9 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Buka Dompet Jakarta</title>
 
+    <!-- Font awesome CSS -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
     <!-- Bootstrap core CSS -->
     <link href="style/bootstrap.css" rel="stylesheet">
     
@@ -14,12 +17,10 @@
     <link href="style/main.css" rel="stylesheet">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script type="text/javascript" src="js/fullpage/jquery.easings.min.js" ></script>
-    <script type="text/javascript" src="js/fullpage/jquery.slimscroll.min.js" ></script>
-    <script type="text/javascript" src="js/fullpage/jquery.fullPage.min.js" ></script>
     <script type="text/javascript">
       $(document).ready(function() {
-        $('#fullpage').fullpage();
+        $('#fullpage').fullpage({
+                        slidesColor: ['#7BAABE', 'whitesmoke', '#ccddff']});
       });
     </script>
   </head>
@@ -40,52 +41,55 @@
 
   <!-- Page content -->
   <div id="fullpage">
-  	<div id="section0" class="section" >
-	  <div id="overview" class="slide active">
-	  	<div id="header">
-	      <div id="yearPeriod">
-	        <label for="period">Periode: </label>
-	          <select name="id" id="period">
-	          <script type="text/template" id="yearPeriod">
-	             <% _.each(yearPeriods, function(period) { %>
-	               <option value="<%= period %>"><%= period %></option>
-	             <% }); %>
-	          </script>
-	          </select>
-	        </div>
-	        <div id="sectorSelection">
-	          <label for="sector">Sektor Anggaran: </label>
-	          <select name="id" id="sector">
-	          <script type="text/template" id="sectorSelection">
-	             <% _.each(selections, function(selection) { %>
-	               <option value="<%= selection.code %>"><%= selection.name %></option>
-	             <% }); %>
-	          </script>
-	          </select>
-	        </div>
-	        <div id="regionSelection">
-	          <label for="region">Wilayah: </label>
-	          <select name="id" id="region">
-	          <script type="text/template" id="regionSelection">
-	            <% _.each(selections, function(selection) { %>
-	              <option value="<%= selection.regex %>"><%= selection.name %></option>
-	            <% }); %>
-	          </script>
-	          </select>
-	        </div>
-	      </div>
-	    <div id="chart"></div>
-	    <div id="legend">
-	      Memuat Data Anggaran...
-	    </div>
-	  </div>
-	  <div class="slide"><h1>Only text</h1></div>
-	  <div class="slide"><h1>And text</h1></div>
-	  <div class="slide"><h1>And more text</h1></div>
+    <div id="section0" class="section" >
+      <div id="overview" class="slide active">
+        <div id="header">
+          <div id="yearPeriod">
+            <label for="period">Periode: </label>
+              <select name="id" id="period">
+              <script type="text/template" id="yearPeriod">
+                 <% _.each(yearPeriods, function(period) { %>
+                   <option value="<%= period %>"><%= period %></option>
+                 <% }); %>
+              </script>
+              </select>
+            </div>
+            <div id="sectorSelection">
+              <label for="sector">Sektor Anggaran: </label>
+              <select name="id" id="sector">
+              <script type="text/template" id="sectorSelection">
+                 <% _.each(selections, function(selection) { %>
+                   <option value="<%= selection.code %>"><%= selection.name %></option>
+                 <% }); %>
+              </script>
+              </select>
+            </div>
+            <div id="regionSelection">
+              <label for="region">Wilayah: </label>
+              <select name="id" id="region">
+              <script type="text/template" id="regionSelection">
+                <% _.each(selections, function(selection) { %>
+                  <option value="<%= selection.regex %>"><%= selection.name %></option>
+                <% }); %>
+              </script>
+              </select>
+            </div>
+          </div>
+        <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
+        <div id="legend">
+          Memuat Data Anggaran...
+        </div>
+      </div>
+      <div class="slide"><h1>Only text</h1></div>
+      <div class="slide"><h1>And text</h1></div>
+      <div class="slide"><h1>And more text</h1></div>
     </div>
   </div>
 
   <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/javascript" src="js/fullpage/jquery.easings.min.js" ></script>
+  <script type="text/javascript" src="js/fullpage/jquery.slimscroll.min.js" ></script>
+  <script type="text/javascript" src="js/fullpage/jquery.fullPage.min.js" ></script>
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/underscore.js" ></script>
   <script type="text/javascript" src="js/backbone.js" ></script>

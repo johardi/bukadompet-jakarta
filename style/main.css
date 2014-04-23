@@ -3,11 +3,6 @@ html, body, div, p {
   padding: 0;
 }
 
-body {
-  background-color: #F7F7F7;
-  padding-top: 80px;
-}
-
 div {
   display: block;
 }
@@ -18,17 +13,15 @@ div {
 }
 
 #overview {
-  padding-top: 30px;
+  padding-top: 110px;
   margin: 0 auto;
 }
 
 #header {
-  font-size: 12px;
+  font-size: 13px;
   font-family: Arial;
   width: 70%;
-  border-bottom: solid 5px #F7F7F7;
-  padding-top: 5px;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   margin: 0 auto;
 }
 
@@ -36,10 +29,12 @@ div {
   font-size: 24px;
   font-family: Georgia;
   width: 70%;
+  padding-top: 10px;
   margin: 0 auto;
 }
 
 #chart {
+  background-color: white;
   width: 70%;
   height: 70%;
   margin: 0 auto;
@@ -83,4 +78,18 @@ div {
   padding-bottom: 3px;
   display: block;
   width: 100%;
+}
+
+/* Waiting animation */
+.fa-spin {
+  -webkit-animation: spin 1s infinite linear;
+  -moz-animation: spin 1s infinite linear;
+  -o-animation: spin 1s infinite linear;
+  animation: spin 1s infinite linear;
+}
+
+i {
+    position: relative;
+    top: 50%;
+    left: 50%;
 }
