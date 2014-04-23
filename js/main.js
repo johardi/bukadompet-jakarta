@@ -8,13 +8,7 @@ var COS = {
       type : "string"
    }, {
       name : "urusan",
-      type : "string",
-      // Handling inconsistency data for urusan code.
-      before : function(v) {
-         if (v == '1.1') { return "1.10"; }
-         else if (v == '1.2') { return "1.20"; }
-         else return v;
-      }
+      type : "string"
    }, {
       name : "namaUrusan",
       type : "string"
@@ -53,31 +47,41 @@ var COS = {
    Router : Backbone.Router.extend(
    { 
       routes : {
-         "overview" : "index",
-         "overview/:sector/:year" : "index"
+         "" : "index",
+         "infogram": "index",
+         "infogram/:region" : "index"
       }, 
-      index : function(sector, year)
+      index : function(region)
       {
-		 var year = (_.isUndefined(year)) ? "2013" : year;
-		 var sector = (_.isUndefined(sector)) ? "1.01" : sector
-		
+         var region = (_.isUndefined(region)) ? "Umum" : region;
+         var regions = 
+             { Umum : "." ,
+              JakartaPusat : "Jakarta Pusat|JAKPUS" ,
+              JakartaBarat : "Jakarta Barat|JAKBAR" ,
+              name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" ,
+              name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" ,
+              name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" ,
+              name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" };
+         
+         var regionReg = regions[region]; 
+        console.log(regionReg);
          // configuration parameters that are used throughout the application:
          COS.config = {
-	        // default endpoint address
-	        endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
-	
+            // default endpoint address
+            endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
+    
             // default dates, all.
             yearPeriod : [ "2013", "2014" ],
             
-            regions : [
-               { name : "Semua Wilayah", regex : "." },
-               { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
-               { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
-               { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
-               { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
-               { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
-               { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
-            ],
+            // regions : [
+            //                { name : "Semua Wilayah", regex : "." },
+            //                { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
+            //                { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
+            //                { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
+            //                { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
+            //                { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
+            //                { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
+            //             ],
 
             sectors : [
                { code : "1.01", name : "Pendidikan" },
@@ -126,17 +130,17 @@ var COS = {
                   "#6A246D", "#8A4873", "#EB0080", "#EF58A0", "#C05A89" ]
          
          };
-		
+        
          // state management
          COS.state = {
             // Store the year of the currently selected period
-            currentYear : year,
+            currentYear : "2013",
 
             // Store the name of the "urusan" by which the data is initially sliced: "Pendidikan"
-            currentSector : sector,
+            currentSector : "1.01",
 
             // Store the name of the region by which the data is initially sliced: "ALL"
-            currentRegion : COS.config.regions[0]["regex"],
+            currentRegion : regionReg,
 
             // Store the name of the column by which the data is initially grouped: "namaProgram"
             currentGrouping : COS.config.groupings[0]
@@ -223,13 +227,13 @@ COS.Views.Main = Backbone.View.extend(
    render : function()
    {
       this.views.title = new COS.Views.Title();
-      this.views.regions = new COS.Views.RegionSelection();
+      // this.views.regions = new COS.Views.RegionSelection();
       this.views.sectors = new COS.Views.SectorSelection();
       this.views.periods = new COS.Views.YearPeriod();
       this.views.treemap = new COS.Views.Treemap();
 
       this.views.title.render();
-      this.views.regions.render();
+      // this.views.regions.render();
       this.views.sectors.render();
       this.views.periods.render();
       this.views.treemap.render();
@@ -327,7 +331,11 @@ COS.Views.SectorSelection = Backbone.View.extend(
    onChange : function(e)
    {
       COS.state.currentSector = $("option:selected", e.target).val();
-	  COS.data = new Miso.Dataset(
+      if (COS.state.currentSector == '1.20' && COS.state.currentYear == '2013') {
+        COS.state.currentSector = '1.2';
+      }
+
+      COS.data = new Miso.Dataset(
       {
           url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
           columns : COS.columns,
@@ -378,6 +386,10 @@ COS.Views.YearPeriod = Backbone.View.extend({
    onChange : function(e)
    {
       COS.state.currentYear = $("option:selected", e.target).val();
+      if (COS.state.currentSector == '1.2' && COS.state.currentYear == '2014') {
+        COS.state.currentSector = '1.20';
+      }
+
       COS.data = new Miso.Dataset(
       {
           url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
@@ -617,7 +629,7 @@ COS.Utils = {
       // How are we selecting rows from the dataset
       dataSlice = function(row) {
          var regionRegex = new RegExp(region);
-         return (regionRegex.test(row["SKPDNama"])) && (row["urusan"] === sector) && (row["year"] == period);
+         return (regionRegex.test(row["SKPDNama"]));
       };
 
       var groupedData = COS.data.rows(dataSlice).groupBy(grouping, ["nilai"]);

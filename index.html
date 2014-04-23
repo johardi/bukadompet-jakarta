@@ -6,9 +6,6 @@
 
     <!-- Font awesome CSS -->
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-
-    <!-- Bootstrap core CSS -->
-    <link href="style/bootstrap.css" rel="stylesheet">
     
     <!-- Fullpage slider CSS -->
     <link href="style/jquery.fullPage.css" rel="stylesheet">
@@ -20,30 +17,37 @@
     <script type="text/javascript">
       $(document).ready(function() {
         $('#fullpage').fullpage({
-                        slidesColor: ['#7BAABE', 'whitesmoke', '#ccddff']});
+            slidesColor: ['#7BAABE'],
+            anchors: ['infogram'],
+            menu: '#menu'
+         });
       });
     </script>
   </head>
-  <body>
-  <!-- Page header -->
-  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#"><span style="color:white;">BUKADOMPET JAKARTA</span></a>
-      </div>
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="https://github.com/obidea/semantika-sgvizler">About</a></li>
-        </ul>
-      </div><!--/.nav-collapse -->
-    </div>
-  </div>
+  <body>  
 
   <!-- Page content -->
   <div id="fullpage">
-    <div id="section0" class="section" >
-      <div id="overview" class="slide active">
-        <div id="header">
+    
+    <!-- First Section -->
+    <div id="section0" class="section">
+      
+      <!-- Menu Header -->
+      <div id="header">
+        <ul id="menu">
+          <li class="toSlide" data-index="1"><a href="#Global"><span>Umum</span></a></li>
+          <li class="toSlide" data-index="2"><a href="#Jakarta_Pusat">Jakarta Pusat</a></li>
+          <li class="toSlide" data-index="3"><a href="#Jakarta_Barat">Jakarta Barat</a></li>
+          <li class="toSlide" data-index="4"><a href="#Jakarta_Utara">Jakarta Utara</a></li>
+          <li class="toSlide" data-index="5"><a href="#Jakarta_Timur">Jakarta Timur</a></li>
+          <li class="toSlide" data-index="6"><a href="#Jakarta_Selatan">Jakarta Selatan</a></li>
+          <li class="toSlide" data-index="7"><a href="#Kep_Seribu">Kep.Seribu</a></li>
+        </ul>
+      </div>
+      
+      <!-- Infogram Umum -->
+      <div id="infogram" class="slide active" data-anchor="Umum">
+        <div id="displayOptions">
           <div id="yearPeriod">
             <label for="period">Periode: </label>
               <select name="id" id="period">
@@ -64,13 +68,33 @@
               </script>
               </select>
             </div>
-            <div id="regionSelection">
-              <label for="region">Wilayah: </label>
-              <select name="id" id="region">
-              <script type="text/template" id="regionSelection">
-                <% _.each(selections, function(selection) { %>
-                  <option value="<%= selection.regex %>"><%= selection.name %></option>
-                <% }); %>
+          </div>
+        <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
+        <div id="legend">
+          Memuat Data Anggaran...
+        </div>
+      </div>
+
+      <!-- Infogram Jakarta Pusat -->
+      <div id="infogram" class="slide" data-anchor="JakartaPusat">
+        <div id="displayOptions">
+          <div id="yearPeriod">
+            <label for="period">Periode: </label>
+              <select name="id" id="period">
+              <script type="text/template" id="yearPeriod">
+                 <% _.each(yearPeriods, function(period) { %>
+                   <option value="<%= period %>"><%= period %></option>
+                 <% }); %>
+              </script>
+              </select>
+            </div>
+            <div id="sectorSelection">
+              <label for="sector">Sektor Anggaran: </label>
+              <select name="id" id="sector">
+              <script type="text/template" id="sectorSelection">
+                 <% _.each(selections, function(selection) { %>
+                   <option value="<%= selection.code %>"><%= selection.name %></option>
+                 <% }); %>
               </script>
               </select>
             </div>
@@ -80,9 +104,9 @@
           Memuat Data Anggaran...
         </div>
       </div>
-      <div class="slide"><h1>Only text</h1></div>
-      <div class="slide"><h1>And text</h1></div>
-      <div class="slide"><h1>And more text</h1></div>
+      
+      <div class="slide" data-anchor="JakartaBarat"><h1>And text</h1></div>
+      <div class="slide" data-anchor="JakartaUtara"><h1>And more text</h1></div>
     </div>
   </div>
 
@@ -90,7 +114,6 @@
   <script type="text/javascript" src="js/fullpage/jquery.easings.min.js" ></script>
   <script type="text/javascript" src="js/fullpage/jquery.slimscroll.min.js" ></script>
   <script type="text/javascript" src="js/fullpage/jquery.fullPage.min.js" ></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/underscore.js" ></script>
   <script type="text/javascript" src="js/backbone.js" ></script>
   <script type="text/javascript" src="js/miso.ds.deps.js"></script>
