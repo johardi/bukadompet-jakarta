@@ -53,12 +53,19 @@ var COS = {
    Router : Backbone.Router.extend(
    { 
       routes : {
-         "" : "index"
+         "overview" : "index",
+         "overview/:sector/:year" : "index"
       }, 
-      index : function()
+      index : function(sector, year)
       {
+		 var year = (_.isUndefined(year)) ? "2013" : year;
+		 var sector = (_.isUndefined(sector)) ? "1.01" : sector
+		
          // configuration parameters that are used throughout the application:
          COS.config = {
+	        // default endpoint address
+	        endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
+	
             // default dates, all.
             yearPeriod : [ "2013", "2014" ],
             
@@ -119,15 +126,17 @@ var COS = {
                   "#6A246D", "#8A4873", "#EB0080", "#EF58A0", "#C05A89" ]
          
          };
+		
          // state management
          COS.state = {
             // Store the year of the currently selected period
-            currentPeriod : COS.config.yearPeriod[0],
-            // Store the name of the region by which the data is initially sliced: "ALL"
-            currentRegion : COS.config.regions[0]["regex"],
+            currentYear : year,
 
             // Store the name of the "urusan" by which the data is initially sliced: "Pendidikan"
-            currentSector : COS.config.sectors[0]["code"],
+            currentSector : sector,
+
+            // Store the name of the region by which the data is initially sliced: "ALL"
+            currentRegion : COS.config.regions[0]["regex"],
 
             // Store the name of the column by which the data is initially grouped: "namaProgram"
             currentGrouping : COS.config.groupings[0]
@@ -136,9 +145,9 @@ var COS = {
          // Define the underlying dataset for this interactive diagram.
          COS.data = new Miso.Dataset(
          {
-            // url : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome&page=20&per_page=500",
+            url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
             // url : "data/data230.json",
-            url : "data/apbd-jakarta.json",
+            // url : "data/apbd-jakarta.json",
             columns : COS.columns,
             parser : COS.ResultParser,
          });
@@ -314,12 +323,25 @@ COS.Views.SectorSelection = Backbone.View.extend(
       return this;
    },
 
-   // Whenever the dropdown option changes, re-render
-   // the chart.
+   // Whenever the dropdown option changes, re-render the chart.
    onChange : function(e)
    {
       COS.state.currentSector = $("option:selected", e.target).val();
-      COS.app.views.treemap.render();
+	  COS.data = new Miso.Dataset(
+      {
+          url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
+          columns : COS.columns,
+          parser : COS.ResultParser,
+      });
+      COS.data.fetch(
+      {
+         success : function() {
+            COS.app.views.treemap.render();
+         },
+         error : function() {
+            COS.app.views.title.update("Failed to load data from " + data.url);
+         }
+      });
    }
 });
 
@@ -355,10 +377,23 @@ COS.Views.YearPeriod = Backbone.View.extend({
 
    onChange : function(e)
    {
-      COS.state.currentPeriod = $("option:selected", e.target).val();
-      COS.app.views.treemap.render();
+      COS.state.currentYear = $("option:selected", e.target).val();
+      COS.data = new Miso.Dataset(
+      {
+          url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
+          columns : COS.columns,
+          parser : COS.ResultParser,
+      });
+      COS.data.fetch(
+      {
+         success : function() {
+            COS.app.views.treemap.render();
+         },
+         error : function() {
+            COS.app.views.title.update("Failed to load data from " + data.url);
+         }
+      });
    }
-
 });
 
 /**
@@ -573,7 +608,7 @@ COS.Utils = {
    computeGroupedData : function()
    {
       // load state
-      var period = COS.state.currentPeriod,
+      var period = COS.state.currentYear,
           region = COS.state.currentRegion,
           sector = COS.state.currentSector,
           grouping = COS.state.currentGrouping,
