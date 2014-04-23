@@ -1,49 +1,65 @@
-html, body {
+html, body, div, p {
   margin: 0;
   padding: 0;
-  background-color: #F7F7F7;
 }
 
-#container {
-  width: 980px;
-  height: 700px;
-  margin: auto;
+body {
+  background-color: #F7F7F7;
+  padding-top: 80px;
+}
+
+div {
+  display: block;
+}
+
+/* Override the default tableCell style */
+.tableCell {
+  vertical-align: top;
+}
+
+#overview {
+  padding-top: 30px;
+  margin: 0 auto;
 }
 
 #header {
-  width: 970px;
-  height: 25px;
   font-size: 12px;
   font-family: Arial;
+  width: 70%;
   border-bottom: solid 5px #F7F7F7;
   padding-top: 5px;
+  padding-bottom: 10px;
+  margin: 0 auto;
 }
 
 #legend {
-  float: left;
-  font-size: 20px;
+  font-size: 24px;
   font-family: Georgia;
-}
-
-#daterange {
-  float: right;
-  display: none;
-  padding-left: 10px;
-}
-
-#grouping {
-  float: right;
-  display: none;
-  padding-left: 10px;
+  width: 70%;
+  margin: 0 auto;
 }
 
 #chart {
-  width: 980px;
+  width: 70%;
+  height: 70%;
+  margin: 0 auto;
+}
+
+#yearPeriod {
+  float: right;
+  padding-left: 10px;
+}
+
+#sectorSelection {
+  float: right;
+  padding-left: 10px;
 }
 
 .cell {
-  color: white;
-  border: solid 1px white;
+  color: black;
+  background-color: #F7F7F7;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   position: absolute;
 }
@@ -52,16 +68,18 @@ html, body {
   z-index: 100;
 }
 
-.label {
+.tag {
+  color: white;
   font-family: sans-serif;
   font-weight: bold;
   margin: 5px;
 }
 
-.label .cost {
+.tag .cost {
   font-family: Georgia;
-  font-size: 1.5em;
+  font-size: 1.7em;
   font-weight: normal;
+  text-align: left;
   padding-bottom: 3px;
   display: block;
   width: 100%;

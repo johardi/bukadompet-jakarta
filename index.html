@@ -1,52 +1,97 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-        <title>Principal areas of Cabinet office spending 2010/2011</title>
-        <link href="style/main.css" rel="stylesheet">
-    </head>
-    <body>
-    	<div id=container>
-	        <div id="header">
-	            <div id="legend">
-	                Loading spending data
-	            </div>
-	            <div id="daterange">
-	                <label for="range">
-	                    in period:
-	                </label>
-	                <select name="id" id="range">
-	                </select>
-	            </div>
-	            <div id="grouping">
-	                <label for="groupby">
-	                    grouped by:
-	                </label>
-	                <select name="id" id="groupby">
-	                </select>
-	            </div>
-	        </div>
-	        <div id="chart"></div>
-        </div>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>Buka Dompet Jakarta</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="style/bootstrap.css" rel="stylesheet">
+    
+    <!-- Fullpage slider CSS -->
+    <link href="style/jquery.fullPage.css" rel="stylesheet">
         
-        <script type="text/javascript" src="js/jquery-1.7.js"></script>
-        <script type="text/javascript" src="js/underscore.js" ></script>
-        <script type="text/javascript" src="js/backbone.js" ></script>
-        <script type="text/javascript" src="js/miso.ds.deps.js"></script>
-        <script type="text/javascript" src="js/d3.v2.min.js"></script>
-        <script type="text/javascript" src="js/accounting.js"></script>
-        <script src="js/main.js"></script>
+    <!-- Custom styles -->
+    <link href="style/main.css" rel="stylesheet">
 
-        <script type="text/template" id="grouping">
-          <% _.each(columns, function(column) { %>
-            <option value="<%= column.name %>"><%= column.name %></option>
-          <% }); %>
-        </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="js/fullpage/jquery.easings.min.js" ></script>
+    <script type="text/javascript" src="js/fullpage/jquery.slimscroll.min.js" ></script>
+    <script type="text/javascript" src="js/fullpage/jquery.fullPage.min.js" ></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#fullpage').fullpage();
+      });
+    </script>
+  </head>
+  <body>
+  <!-- Page header -->
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#"><span style="color:white;">BUKADOMPET JAKARTA</span></a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="https://github.com/obidea/semantika-sgvizler">About</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
 
-        <script type="text/template" id="dateRanges">
-          <% _.each(dateRanges, function(range) { %>
-            <option value="<%= range %>"><%= range %></option>
-          <% }); %>
-        </script>
-    </body>
+  <!-- Page content -->
+  <div id="fullpage">
+  	<div id="section0" class="section" >
+	  <div id="overview" class="slide active">
+	  	<div id="header">
+	      <div id="yearPeriod">
+	        <label for="period">Periode: </label>
+	          <select name="id" id="period">
+	          <script type="text/template" id="yearPeriod">
+	             <% _.each(yearPeriods, function(period) { %>
+	               <option value="<%= period %>"><%= period %></option>
+	             <% }); %>
+	          </script>
+	          </select>
+	        </div>
+	        <div id="sectorSelection">
+	          <label for="sector">Sektor Anggaran: </label>
+	          <select name="id" id="sector">
+	          <script type="text/template" id="sectorSelection">
+	             <% _.each(selections, function(selection) { %>
+	               <option value="<%= selection.code %>"><%= selection.name %></option>
+	             <% }); %>
+	          </script>
+	          </select>
+	        </div>
+	        <div id="regionSelection">
+	          <label for="region">Wilayah: </label>
+	          <select name="id" id="region">
+	          <script type="text/template" id="regionSelection">
+	            <% _.each(selections, function(selection) { %>
+	              <option value="<%= selection.regex %>"><%= selection.name %></option>
+	            <% }); %>
+	          </script>
+	          </select>
+	        </div>
+	      </div>
+	    <div id="chart"></div>
+	    <div id="legend">
+	      Memuat Data Anggaran...
+	    </div>
+	  </div>
+	  <div class="slide"><h1>Only text</h1></div>
+	  <div class="slide"><h1>And text</h1></div>
+	  <div class="slide"><h1>And more text</h1></div>
+    </div>
+  </div>
+
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/underscore.js" ></script>
+  <script type="text/javascript" src="js/backbone.js" ></script>
+  <script type="text/javascript" src="js/miso.ds.deps.js"></script>
+  <script type="text/javascript" src="js/d3.v2.min.js"></script>
+  <script type="text/javascript" src="js/accounting.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  </body>
 </html>
