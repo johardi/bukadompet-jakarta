@@ -17,7 +17,8 @@
     <script type="text/javascript">
       $(document).ready(function() {
         $('#fullpage').fullpage({
-            slidesColor: ['#7BAABE']
+            slidesColor: ['#7BAABE', '#4BBFC3'],
+            anchors: ['main', 'realisasi']
          });
       });
     </script>
@@ -61,20 +62,17 @@
 
   <!-- Page content -->
   <div id="fullpage">  
-    <div id="section0" class="section">
-      <div class="slide active" data-anchor="Umum">
-        <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
-        <div id="legend">
-          Memuat Data Anggaran...
-        </div>
+    <div id="main" class="section">
+      <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
+      <div id="legend">
+         Memuat Data Anggaran...
       </div>
-
-      <!-- Infogram Jakarta Pusat -->
-      <div class="slide" data-anchor="JakartaPusat"><h1>Tentang Jakarta Pusat</h1>
+    </div>
+    <div id="realisasi" class="section">
+      <div id="donut"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
+      <div id="legend2">
+        Memuat Data Anggaran...
       </div>
-      
-      <div class="slide" data-anchor="JakartaBarat"><h1>And text</h1></div>
-      <div class="slide" data-anchor="JakartaUtara"><h1>And more text</h1></div>
     </div>
   </div>
 

@@ -43,6 +43,82 @@ var COS = {
       }
    } ],
 
+   // configuration parameters that are used throughout the application:
+   config : {
+      // default dates, all.
+      yearPeriod : [ "2013", "2014" ],
+
+      regions : [
+         { name : "Semua Wilayah", regex : "." },
+         { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
+         { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
+         { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
+         { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
+         { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
+         { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
+      ],
+       
+      sectors : [
+         { code : "1.01", name : "Pendidikan" },
+         { code : "1.02", name : "Kesehatan" },
+         { code : "1.03", name : "Pekerjaan Umum" },
+         { code : "1.04", name : "Perumahan Rakyat" },
+         { code : "1.05", name : "Penataan Ruang" },
+         { code : "1.06", name : "Perencanaan Pembangunan" },
+         { code : "1.07", name : "Perhubungan" },
+         { code : "1.08", name : "Lingkungan Hidup" },
+         { code : "1.09", name : "Pertahanan" },
+         { code : "1.10", name : "Kependudukan dan Catatan Sipil" },
+         { code : "1.11", name : "Pemberdayaan Perempuan dan Perlindungan Anak" },
+         { code : "1.12", name : "Keluarga Berencana dan Keluarga Sejahtera" },
+         { code : "1.13", name : "Sosial" },
+         { code : "1.14", name : "Ketenagakerjaan" },
+         { code : "1.15", name : "Koperasi dan Usaha Kecil Menengah" },
+         { code : "1.16", name : "Penanaman Modal" },
+         { code : "1.17", name : "Kebudayaan" },
+         { code : "1.18", name : "Pemuda dan Olahraga" },
+         { code : "1.19", name : "Kesatuan Bangsa dan Politik Dalam Negeri" },
+         { code : "1.20", name : "Otonomi Daerah dan Administrasi Daerah" },
+         { code : "1.21", name : "Ketahanan Pangan" },
+         { code : "1.22", name : "Pemberdayaan Masyarakat dan Desa (RW)" },
+         { code : "1.23", name : "Statistik" },
+         { code : "1.24", name : "Kearsipan" },
+         { code : "1.25", name : "Komunikasi dan Informatika" },
+         { code : "1.26", name : "Perpustakaan" },
+         { code : "2.01", name : "Pertanian" },
+         { code : "2.02", name : "Kehutanan" },
+         { code : "2.03", name : "Energi dan Sumber Daya Mineral" },
+         { code : "2.04", name : "Pariwisata" },
+         { code : "2.05", name : "Perikanan, Kelautan dan Peternakan" },
+         { code : "2.06", name : "Perdagangan" },
+         { code : "2.07", name : "Industri" }
+      ],
+       
+      // Define the maximum number of groups to be included in the chart at any time
+      maxGroups : 20,
+      
+      categoryColors : [ "#CF3D1E", "#F15623", "#F68B1F", "#FFC60B", "#DFCE21", "#BCD631", "#95C93D", "#48B85C",
+            "#00833D", "#00B48D", "#60C4B1", "#27C4F4", "#478DCB", "#3E67B1", "#4251A3", "#59449B", "#6E3F7C",
+            "#6A246D", "#8A4873", "#EB0080", "#EF58A0", "#C05A89" ]
+   },
+
+   // state management
+   state : {
+      // Store the year of the currently selected period
+      currentYear : "2013",
+
+      // Store the name of the "urusan" by which the data is initially sliced: "Pendidikan"
+      currentSector : "1.01",
+
+      // Store the name of the region by which the data is initially sliced: "ALL"
+      currentRegion : ".",
+
+      // Store the name of the column by which the data is initially grouped: "namaProgram"
+      currentGrouping : "namaProgram"
+   },
+
+   Dataset : {},
+
    // container for our application views
    Views : {},
 
@@ -51,103 +127,56 @@ var COS = {
    { 
       routes : {
          "" : "index",
+         "main" : "index",
+         "realisasi" : "monitor"
       },
 
       index : function()
       {
-         // configuration parameters that are used throughout the application:
-         COS.config = {
-            // default dates, all.
-            yearPeriod : [ "2013", "2014" ],
-
-            regions : [
-               { name : "Semua Wilayah", regex : "." },
-               { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
-               { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
-               { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
-               { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
-               { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
-               { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
-            ],
-            
-            sectors : [
-               { code : "1.01", name : "Pendidikan" },
-               { code : "1.02", name : "Kesehatan" },
-               { code : "1.03", name : "Pekerjaan Umum" },
-               { code : "1.04", name : "Perumahan Rakyat" },
-               { code : "1.05", name : "Penataan Ruang" },
-               { code : "1.06", name : "Perencanaan Pembangunan" },
-               { code : "1.07", name : "Perhubungan" },
-               { code : "1.08", name : "Lingkungan Hidup" },
-               { code : "1.09", name : "Pertahanan" },
-               { code : "1.10", name : "Kependudukan dan Catatan Sipil" },
-               { code : "1.11", name : "Pemberdayaan Perempuan dan Perlindungan Anak" },
-               { code : "1.12", name : "Keluarga Berencana dan Keluarga Sejahtera" },
-               { code : "1.13", name : "Sosial" },
-               { code : "1.14", name : "Ketenagakerjaan" },
-               { code : "1.15", name : "Koperasi dan Usaha Kecil Menengah" },
-               { code : "1.16", name : "Penanaman Modal" },
-               { code : "1.17", name : "Kebudayaan" },
-               { code : "1.18", name : "Pemuda dan Olahraga" },
-               { code : "1.19", name : "Kesatuan Bangsa dan Politik Dalam Negeri" },
-               { code : "1.20", name : "Otonomi Daerah dan Administrasi Daerah" },
-               { code : "1.21", name : "Ketahanan Pangan" },
-               { code : "1.22", name : "Pemberdayaan Masyarakat dan Desa (RW)" },
-               { code : "1.23", name : "Statistik" },
-               { code : "1.24", name : "Kearsipan" },
-               { code : "1.25", name : "Komunikasi dan Informatika" },
-               { code : "1.26", name : "Perpustakaan" },
-               { code : "2.01", name : "Pertanian" },
-               { code : "2.02", name : "Kehutanan" },
-               { code : "2.03", name : "Energi dan Sumber Daya Mineral" },
-               { code : "2.04", name : "Pariwisata" },
-               { code : "2.05", name : "Perikanan, Kelautan dan Peternakan" },
-               { code : "2.06", name : "Perdagangan" },
-               { code : "2.07", name : "Industri" }
-            ],
-            
-            // Define the maximum number of groups to be included in the chart at any time
-            maxGroups : 20,
-            
-            categoryColors : [ "#CF3D1E", "#F15623", "#F68B1F", "#FFC60B", "#DFCE21", "#BCD631", "#95C93D", "#48B85C",
-                  "#00833D", "#00B48D", "#60C4B1", "#27C4F4", "#478DCB", "#3E67B1", "#4251A3", "#59449B", "#6E3F7C",
-                  "#6A246D", "#8A4873", "#EB0080", "#EF58A0", "#C05A89" ]
-         
-         };
-        
-         // state management
-         COS.state = {
-            // Store the year of the currently selected period
-            currentYear : "2013",
-
-            // Store the name of the "urusan" by which the data is initially sliced: "Pendidikan"
-            currentSector : "1.01",
-
-            // Store the name of the region by which the data is initially sliced: "ALL"
-            currentRegion : ".",
-
-            // Store the name of the column by which the data is initially grouped: "namaProgram"
-            currentGrouping : COS.columns[6].name
-         };
-
          // Define the underlying dataset for this interactive diagram.
-         COS.data = new Miso.Dataset(
-         {
-            url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
-            columns : COS.columns,
-            parser : COS.ResultParser,
-         });
+         if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
+            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);		
+	        COS.Dataset.fetch(
+	        {
+	           success : function() {
+		          COS.header = new COS.Views.Header();
+	              COS.app = new COS.Views.Main();
+	              COS.header.render();
+	              COS.app.render();
+	           },
+	           error : function() {
+	              COS.app.views.title.update("Failed to load data from " + data.url);
+	           }
+	        });
+         }
+         else {
+	        COS.app = new COS.Views.Main();
+	        COS.app.render();
+         }
+      },
 
-         COS.data.fetch(
-         {
-            success : function() {
-               COS.app = new COS.Views.Main();
-               COS.app.render();
-            },
-            error : function() {
-               COS.app.views.title.update("Failed to load data from " + data.url);
-            }
-         });
+      monitor : function()
+      {
+         // Define the underlying dataset for this interactive diagram.
+         if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
+            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);		
+	        COS.Dataset.fetch(
+	        {
+	           success : function() {
+		          COS.header = new COS.Views.Header();
+	              COS.monitor = new COS.Views.Monitor();
+	              COS.header.render();
+	              COS.monitor.render();
+	           },
+	           error : function() {
+	              COS.app.views.title.update("Failed to load data from " + data.url);
+	           }
+	        });
+         }
+         else {
+	        COS.monitor = new COS.Views.Monitor();
+	        COS.monitor.render();
+         }
       }
    })
 };
@@ -196,6 +225,25 @@ _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
    }
 });
 
+COS.Views.Header = Backbone.View.extend(
+{
+   initialize : function()
+   {
+      this.views = {};
+   },
+
+   render : function()
+   {
+      this.views.regions = new COS.Views.RegionSelection();
+      this.views.sectors = new COS.Views.SectorSelection();
+      this.views.periods = new COS.Views.YearPeriod();
+
+      this.views.regions.render();
+      this.views.sectors.render();
+      this.views.periods.render();
+   }
+});
+
 /**
  * Main application view
  */
@@ -208,17 +256,28 @@ COS.Views.Main = Backbone.View.extend(
 
    render : function()
    {
-      this.views.title = new COS.Views.Title();
-      this.views.regions = new COS.Views.RegionSelection();
-      this.views.sectors = new COS.Views.SectorSelection();
-      this.views.periods = new COS.Views.YearPeriod();
+	  this.views.title = new COS.Views.Title();
       this.views.treemap = new COS.Views.Treemap();
 
       this.views.title.render();
-      this.views.regions.render();
-      this.views.sectors.render();
-      this.views.periods.render();
       this.views.treemap.render();
+   }
+});
+
+COS.Views.Monitor = Backbone.View.extend(
+{
+   initialize : function()
+   {
+      this.views = {};
+   },
+
+   render : function()
+   {
+	  this.views.title = new COS.Views.Title();
+      this.views.donut = new COS.Views.Donut();
+
+      this.views.title.render();
+      this.views.donut.render();
    }
 });
 
@@ -318,13 +377,8 @@ COS.Views.SectorSelection = Backbone.View.extend(
         COS.state.currentSector = '1.2';
       }
 
-      COS.data = new Miso.Dataset(
-      {
-          url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
-          columns : COS.columns,
-          parser : COS.ResultParser,
-      });
-      COS.data.fetch(
+      COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
+      COS.Dataset.fetch(
       {
          success : function() {
             COS.app.views.treemap.render();
@@ -374,13 +428,8 @@ COS.Views.YearPeriod = Backbone.View.extend({
         COS.state.currentSector = '1.20';
       }
 
-      COS.data = new Miso.Dataset(
-      {
-          url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
-          columns : COS.columns,
-          parser : COS.ResultParser,
-      });
-      COS.data.fetch(
+      COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
+      COS.Dataset.fetch(
       {
          success : function() {
             COS.app.views.treemap.render();
@@ -577,9 +626,67 @@ COS.Views.Treemap = Backbone.View.extend(
    }
 });
 
+/**
+ * A tree map, uses d3.
+ */
+COS.Views.Donut = Backbone.View.extend(
+{
+   el : "#donut",
+
+   initialize : function(options)
+   {
+      this.width = $("#donut").width();
+      this.height = $("#donut").height();
+      this.setElement($(this.el));
+   },
+
+   _hideGroup : function(elType, fadeTime, offset)
+   {
+      if (fadeTime) {
+         offset = offset || 0;
+         $(elType).each(function(index)
+         {
+            $(this).delay(offset * index).fadeOut(fadeTime);
+         });
+      }
+      else {
+         $(elType).hide();
+      }
+   },
+
+   _showGroup : function(elType, fadeTime, offset)
+   {
+      if (fadeTime) {
+         offset = offset || 0;
+         $(elType).each(function(index)
+         {
+            $(this).delay(offset * index).fadeIn(fadeTime);
+         });
+      }
+      else {
+         $(elType).show();
+      }
+   },
+
+   render : function() 
+   {
+      // NO-OP
+   }
+});
+
 // Random Utility functions
 COS.Utils =
 {
+   // Create a new dataset with the given endpoint URL
+   createDataset : function(sector, year) {
+      return new Miso.Dataset(
+      {
+         url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
+         columns : COS.columns,
+         parser : COS.ResultParser,
+      });
+   },
+
    // Return the string supplied with its first character converted to upper case
    toTitleCase : function(str) {
       return str.charAt(0).toUpperCase() + str.substr(1);
@@ -612,7 +719,7 @@ COS.Utils =
          return regionRegex.test(row["SKPDNama"]);
       };
 
-      var groupedData = COS.data.rows(dataSlice).groupBy(grouping, ["nilai"]);
+      var groupedData = COS.Dataset.rows(dataSlice).groupBy(grouping, ["nilai"]);
 
       groupedData.sort(
       {
