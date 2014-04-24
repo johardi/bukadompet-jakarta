@@ -12,63 +12,57 @@
         
     <!-- Custom styles -->
     <link href="style/main.css" rel="stylesheet">
-
+  <link rel="stylesheet" href="style/chosen.min.css">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         $('#fullpage').fullpage({
-            slidesColor: ['#7BAABE'],
-            anchors: ['infogram'],
-            menu: '#menu'
+            slidesColor: ['#7BAABE']
          });
       });
     </script>
   </head>
   <body>  
 
-  <!-- Page content -->
-  <div id="fullpage">
-    
-    <!-- First Section -->
-    <div id="section0" class="section">
-      
-      <!-- Menu Header -->
-      <div id="header">
-        <ul id="menu">
-          <li class="toSlide" data-index="1"><a href="#Global"><span>Umum</span></a></li>
-          <li class="toSlide" data-index="2"><a href="#Jakarta_Pusat">Jakarta Pusat</a></li>
-          <li class="toSlide" data-index="3"><a href="#Jakarta_Barat">Jakarta Barat</a></li>
-          <li class="toSlide" data-index="4"><a href="#Jakarta_Utara">Jakarta Utara</a></li>
-          <li class="toSlide" data-index="5"><a href="#Jakarta_Timur">Jakarta Timur</a></li>
-          <li class="toSlide" data-index="6"><a href="#Jakarta_Selatan">Jakarta Selatan</a></li>
-          <li class="toSlide" data-index="7"><a href="#Kep_Seribu">Kep.Seribu</a></li>
-        </ul>
+  <!-- Menu Header -->
+  <div id="header">
+    <div class="pageTitle">BukaDompet.Jakarta</div>
+  	  <div id="displayOptions">
+        <div id="yearPeriod">
+          <select data-placeholder="Pilih Tahun..." class="chosen-select" id="year">
+          <script type="text/template" id="yearPeriod">
+             <% _.each(yearPeriods, function(year) { %>
+               <option value="<%= year %>"><%= year %></option>
+             <% }); %>
+          </script>
+          </select>
+        </div>
+        <div id="sectorSelection">
+          <select data-placeholder="Pilih Sektor Anggaran..." class="chosen-select" id="sector">
+          <script type="text/template" id="sectorSelection">
+             <% _.each(selections, function(selection) { %>
+               <option value="<%= selection.code %>"><%= selection.name %></option>
+             <% }); %>
+          </script>
+          </select>
+        </div>
+        <div id="regionSelection">
+          <select data-placeholder="Pilih Wilayah..." class="chosen-select" id="region">
+          <script type="text/template" id="regionSelection">
+            <% _.each(selections, function(selection) { %>
+              <option value="<%= selection.regex %>"><%= selection.name %></option>
+            <% }); %>
+          </script>
+          </select>
+        </div>
       </div>
-      
-      <!-- Infogram Umum -->
-      <div id="infogram" class="slide active" data-anchor="Umum">
-        <div id="displayOptions">
-          <div id="yearPeriod">
-            <label for="period">Periode: </label>
-              <select name="id" id="period">
-              <script type="text/template" id="yearPeriod">
-                 <% _.each(yearPeriods, function(period) { %>
-                   <option value="<%= period %>"><%= period %></option>
-                 <% }); %>
-              </script>
-              </select>
-            </div>
-            <div id="sectorSelection">
-              <label for="sector">Sektor Anggaran: </label>
-              <select name="id" id="sector">
-              <script type="text/template" id="sectorSelection">
-                 <% _.each(selections, function(selection) { %>
-                   <option value="<%= selection.code %>"><%= selection.name %></option>
-                 <% }); %>
-              </script>
-              </select>
-            </div>
-          </div>
+    </div>
+  </div>
+
+  <!-- Page content -->
+  <div id="fullpage">  
+    <div id="section0" class="section">
+      <div class="slide active" data-anchor="Umum">
         <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
         <div id="legend">
           Memuat Data Anggaran...
@@ -76,33 +70,7 @@
       </div>
 
       <!-- Infogram Jakarta Pusat -->
-      <div id="infogram" class="slide" data-anchor="JakartaPusat">
-        <div id="displayOptions">
-          <div id="yearPeriod">
-            <label for="period">Periode: </label>
-              <select name="id" id="period">
-              <script type="text/template" id="yearPeriod">
-                 <% _.each(yearPeriods, function(period) { %>
-                   <option value="<%= period %>"><%= period %></option>
-                 <% }); %>
-              </script>
-              </select>
-            </div>
-            <div id="sectorSelection">
-              <label for="sector">Sektor Anggaran: </label>
-              <select name="id" id="sector">
-              <script type="text/template" id="sectorSelection">
-                 <% _.each(selections, function(selection) { %>
-                   <option value="<%= selection.code %>"><%= selection.name %></option>
-                 <% }); %>
-              </script>
-              </select>
-            </div>
-          </div>
-        <div id="chart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
-        <div id="legend">
-          Memuat Data Anggaran...
-        </div>
+      <div class="slide" data-anchor="JakartaPusat"><h1>Tentang Jakarta Pusat</h1>
       </div>
       
       <div class="slide" data-anchor="JakartaBarat"><h1>And text</h1></div>
@@ -120,5 +88,9 @@
   <script type="text/javascript" src="js/d3.v2.min.js"></script>
   <script type="text/javascript" src="js/accounting.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
+  <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
+  <script type="text/javascript">
+    $('.chosen-select').chosen();
+  </script>
   </body>
 </html>

@@ -1,5 +1,8 @@
 // namespace
 var COS = {
+   // default endpoint address
+   endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
+
    columns : [ {
       name : "year",
       type : "number"
@@ -48,41 +51,25 @@ var COS = {
    { 
       routes : {
          "" : "index",
-         "infogram": "index",
-         "infogram/:region" : "index"
-      }, 
-      index : function(region)
+      },
+
+      index : function()
       {
-         var region = (_.isUndefined(region)) ? "Umum" : region;
-         var regions = 
-             { Umum : "." ,
-              JakartaPusat : "Jakarta Pusat|JAKPUS" ,
-              JakartaBarat : "Jakarta Barat|JAKBAR" ,
-              name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" ,
-              name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" ,
-              name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" ,
-              name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" };
-         
-         var regionReg = regions[region]; 
-        console.log(regionReg);
          // configuration parameters that are used throughout the application:
          COS.config = {
-            // default endpoint address
-            endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
-    
             // default dates, all.
             yearPeriod : [ "2013", "2014" ],
-            
-            // regions : [
-            //                { name : "Semua Wilayah", regex : "." },
-            //                { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
-            //                { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
-            //                { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
-            //                { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
-            //                { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
-            //                { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
-            //             ],
 
+            regions : [
+               { name : "Semua Wilayah", regex : "." },
+               { name : "Jakarta Pusat", regex : "Jakarta Pusat|JAKPUS" },
+               { name : "Jakarta Barat", regex : "Jakarta Barat|JAKBAR" },
+               { name : "Jakarta Utara", regex : "Jakarta Utara|JAKUT" },
+               { name : "Jakarta Timur", regex : "Jakarta Timur|JAKTIM" },
+               { name : "Jakarta Selatan", regex : "Jakarta Selatan|JAKSEL" },
+               { name : "Kep.Seribu", regex : "Kep.Seribu|Kep. Seribu" }
+            ],
+            
             sectors : [
                { code : "1.01", name : "Pendidikan" },
                { code : "1.02", name : "Kesehatan" },
@@ -118,9 +105,6 @@ var COS = {
                { code : "2.06", name : "Perdagangan" },
                { code : "2.07", name : "Industri" }
             ],
-
-            // Define which columns the data can be grouped by: "namaProgram"
-            groupings : [ COS.columns[6].name ],
             
             // Define the maximum number of groups to be included in the chart at any time
             maxGroups : 20,
@@ -140,18 +124,16 @@ var COS = {
             currentSector : "1.01",
 
             // Store the name of the region by which the data is initially sliced: "ALL"
-            currentRegion : regionReg,
+            currentRegion : ".",
 
             // Store the name of the column by which the data is initially grouped: "namaProgram"
-            currentGrouping : COS.config.groupings[0]
+            currentGrouping : COS.columns[6].name
          };
 
          // Define the underlying dataset for this interactive diagram.
          COS.data = new Miso.Dataset(
          {
-            url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
-            // url : "data/data230.json",
-            // url : "data/apbd-jakarta.json",
+            url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
             columns : COS.columns,
             parser : COS.ResultParser,
          });
@@ -227,13 +209,13 @@ COS.Views.Main = Backbone.View.extend(
    render : function()
    {
       this.views.title = new COS.Views.Title();
-      // this.views.regions = new COS.Views.RegionSelection();
+      this.views.regions = new COS.Views.RegionSelection();
       this.views.sectors = new COS.Views.SectorSelection();
       this.views.periods = new COS.Views.YearPeriod();
       this.views.treemap = new COS.Views.Treemap();
 
       this.views.title.render();
-      // this.views.regions.render();
+      this.views.regions.render();
       this.views.sectors.render();
       this.views.periods.render();
       this.views.treemap.render();
@@ -289,11 +271,11 @@ COS.Views.RegionSelection = Backbone.View.extend(
       this.$el.html(this.template({
          selections : this.regions
       }));
+      this.$el.trigger('chosen:updated')
       return this;
    },
 
-   // Whenever the dropdown option changes, re-render
-   // the chart.
+   // Whenever the dropdown option changes, re-render the chart.
    onChange : function(e)
    {
       COS.state.currentRegion = $("option:selected", e.target).val();
@@ -324,6 +306,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
       this.$el.html(this.template({
          selections : this.sectors
       }));
+      this.$el.trigger('chosen:updated')
       return this;
    },
 
@@ -337,7 +320,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
 
       COS.data = new Miso.Dataset(
       {
-          url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
+          url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
           columns : COS.columns,
           parser : COS.ResultParser,
       });
@@ -358,7 +341,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
  */
 COS.Views.YearPeriod = Backbone.View.extend({
 
-   el : '#period',
+   el : '#year',
    template : 'script#yearPeriod',
 
    events : {
@@ -380,6 +363,7 @@ COS.Views.YearPeriod = Backbone.View.extend({
       this.$el.html(this.template({
          yearPeriods : this.periods
       }));
+      this.$el.trigger('chosen:updated')
       return this;
    },
 
@@ -392,7 +376,7 @@ COS.Views.YearPeriod = Backbone.View.extend({
 
       COS.data = new Miso.Dataset(
       {
-          url : COS.config.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
+          url : COS.endpointUrl + "&urusan=" + COS.state.currentSector + "&year=" + COS.state.currentYear + "&per_page=250",
           columns : COS.columns,
           parser : COS.ResultParser,
       });
@@ -417,7 +401,6 @@ COS.Views.Treemap = Backbone.View.extend(
 
    initialize : function(options)
    {
-      // options = options || {};
       this.width = $("#chart").width();
       this.height = $("#chart").height();
       this.setElement($(this.el));
@@ -451,7 +434,7 @@ COS.Views.Treemap = Backbone.View.extend(
       }
    },
 
-   render : function()
+   render : function() 
    {
       // load state
       var grouping = COS.state.currentGrouping,
@@ -461,40 +444,38 @@ COS.Views.Treemap = Backbone.View.extend(
       var groupedData = COS.Utils.computeGroupedData();
 
       // === build data for d3
-      var expenseData = {
+      var expenseData =
+      {
          name : grouping,
          elements : []
       };
 
-      groupedData.each(function(row, index)
-      {
+      groupedData.each(function(row, index) {
          if (index >= maxGroups) {
             return;
          }
-         expenseData.elements.push({
+         expenseData.elements.push(
+         {
             name : row[grouping],
             total : row["nilai"],
             color : COS.config.categoryColors[index % COS.config.categoryColors.length]
          });
       });
 
-      // === build d3 chart
-      // Build a treemap chart with the supplied data (using D3 to create, size,
-      // color and layout a series of DOM elements).
-      // Add labels to each cell, applying dynamic styling choices according to
-      // the space available.
-      // Bind custom handlers to cell highlighting and selection events.
+      // Build a treemap chart using the supplied data.
+      // - Add labels to each cell, applying dynamic styling according to
+      //   the space available.
+      // - Bind custom handlers to cell highlighting and selection events.
       this.$el.empty();
       var selected = null;
 
-      var layout = d3.layout.treemap().sort(function(a, b)
-      {
+      var layout = d3.layout.treemap().sort(function(a, b) {
          return a.value - b.value;
-      }).children(function(d)
-      {
+      })
+      .children(function(d) {
          return d.elements;
-      }).size([ this.width, this.height ]).value(function(d)
-      {
+      })
+      .size([ this.width, this.height ]).value(function(d) {
          return d.total;
       });
 
@@ -506,38 +487,39 @@ COS.Views.Treemap = Backbone.View.extend(
       //           .attr("width", m_width)
       //           .attr("height", m_width * this.height / this.width).append("div")
 
-
       var chart = d3.select("#chart").append("div")
         
       // set default styles for chart
-      .call(function() {
-               this.attr("class", "chart")
-                   .style("position", "relative");
-            });
+      .call(function()
+      {
+         this.attr("class", "chart")
+         .style("position", "relative");
+      });
 
       // set up data for the chart
       chart.data([expenseData]).selectAll("div").data(function(d)
       {
          return layout.nodes(d);
-      }).enter().append("div")
+      })
+      .enter().append("div")
 
       // append a div for every piece of the treemap
       .call(function()
       {
-         this.attr("class", "cell").style("left", function(d)
-         {
+         this.attr("class", "cell")
+         .style("left", function(d) {
             return d.x + "px";
-         }).style("top", function(d)
-         {
+         })
+         .style("top", function(d) {
             return d.y + "px";
-         }).style("width", function(d)
-         {
+         })
+         .style("width", function(d) {
             return d.dx - 1 + "px";
-         }).style("height", function(d)
-         {
+         })
+         .style("height", function(d) {
             return d.dy - 1 + "px";
-         }).style("background", function(d)
-         {
+         })
+         .style("background", function(d) {
             return d.color || "#F7F7F7";
          });
       })
@@ -568,22 +550,22 @@ COS.Views.Treemap = Backbone.View.extend(
       {
          $(".cell").stop().fadeTo("fast", 1.0);
          COS.app.views.title.update();
-      }).append("p")
+      })
+      .append("p")
 
       // set the size for the labels for the dollar amount.
       // vary size based on size.
       .call(function()
       {
-         this.attr("class", "tag").style("font-size", function(d)
-         {
+         this.attr("class", "tag").style("font-size", function(d) {
             return d.area > 55000 ? "14px" : d.area > 20000 ? "12px" : d.area > 13000 ? "10px" : "0px";
-         }).style("text-transform", function(d)
-         {
+         })
+         .style("text-transform", function(d) {
             return d.area > 20000 ? "none" : "uppercase";
          });
       })
 
-      // append dollar amounts
+      // append rupiah amounts
       .html(function(d)
       {
          return "<span class='cost'>" + COS.Utils.toMoney(d.value.toFixed(0)) + "</span>" + COS.Utils.toTitleCase(d.name);
@@ -596,16 +578,15 @@ COS.Views.Treemap = Backbone.View.extend(
 });
 
 // Random Utility functions
-COS.Utils = {
+COS.Utils =
+{
    // Return the string supplied with its first character converted to upper case
-   toTitleCase : function(str)
-   {
+   toTitleCase : function(str) {
       return str.charAt(0).toUpperCase() + str.substr(1);
    },
 
    // Format currency values for display using the required prefix and separator
-   toMoney : function(amount)
-   {
+   toMoney : function(amount) {
       options = {
          symbol : "Rp",
          decimal : ",",
@@ -617,8 +598,7 @@ COS.Utils = {
    },
 
    // Compute grouped data for a specific range, by the grouping.
-   computeGroupedData : function()
-   {
+   computeGroupedData : function() {
       // load state
       var period = COS.state.currentYear,
           region = COS.state.currentRegion,
@@ -629,14 +609,14 @@ COS.Utils = {
       // How are we selecting rows from the dataset
       dataSlice = function(row) {
          var regionRegex = new RegExp(region);
-         return (regionRegex.test(row["SKPDNama"]));
+         return regionRegex.test(row["SKPDNama"]);
       };
 
       var groupedData = COS.data.rows(dataSlice).groupBy(grouping, ["nilai"]);
 
-      groupedData.sort({
-         comparator : function(a, b)
-         {
+      groupedData.sort(
+      {
+         comparator : function(a, b) {
             if (b["nilai"] > a["nilai"]) {
                return 1;
             }
