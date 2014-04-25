@@ -6,19 +6,23 @@
 
     <!-- Font awesome CSS -->
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+    <!-- Chosen option picker CSS -->
+    <link rel="stylesheet" href="style/chosen.min.css">
     
     <!-- Fullpage slider CSS -->
     <link href="style/jquery.fullPage.css" rel="stylesheet">
         
     <!-- Custom styles -->
     <link href="style/main.css" rel="stylesheet">
-  <link rel="stylesheet" href="style/chosen.min.css">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         $('#fullpage').fullpage({
             slidesColor: ['#7BAABE', '#4BBFC3'],
-            anchors: ['main', 'realisasi']
+            anchors: ['main', 'realisasi'],
+            scrollOverflow: true
          });
       });
     </script>
@@ -30,7 +34,7 @@
     <div class="pageTitle">BukaDompet.Jakarta</div>
   	  <div id="displayOptions">
         <div id="yearPeriod">
-          <select data-placeholder="Pilih Tahun..." class="chosen-select" id="year">
+          <select data-placeholder="Pilih Tahun..." class="chosen-select" id="year" tabindex="-1">
           <script type="text/template" id="yearPeriod">
              <% _.each(yearPeriods, function(year) { %>
                <option value="<%= year %>"><%= year %></option>
@@ -39,7 +43,7 @@
           </select>
         </div>
         <div id="sectorSelection">
-          <select data-placeholder="Pilih Sektor Anggaran..." class="chosen-select" id="sector">
+          <select data-placeholder="Pilih Sektor Anggaran..." class="chosen-select" id="sector" tabindex="-1">
           <script type="text/template" id="sectorSelection">
              <% _.each(selections, function(selection) { %>
                <option value="<%= selection.code %>"><%= selection.name %></option>
@@ -48,7 +52,7 @@
           </select>
         </div>
         <div id="regionSelection">
-          <select data-placeholder="Pilih Wilayah..." class="chosen-select" id="region">
+          <select data-placeholder="Pilih Wilayah..." class="chosen-select" id="region" tabindex="-1">
           <script type="text/template" id="regionSelection">
             <% _.each(selections, function(selection) { %>
               <option value="<%= selection.regex %>"><%= selection.name %></option>
@@ -69,10 +73,8 @@
       </div>
     </div>
     <div id="realisasi" class="section">
-      <div id="donut"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
-      <div id="legend2">
-        Memuat Data Anggaran...
-      </div>
+      <div id="donut"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
+      <div id="bar"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
     </div>
   </div>
 
@@ -80,13 +82,13 @@
   <script type="text/javascript" src="js/fullpage/jquery.easings.min.js" ></script>
   <script type="text/javascript" src="js/fullpage/jquery.slimscroll.min.js" ></script>
   <script type="text/javascript" src="js/fullpage/jquery.fullPage.min.js" ></script>
+  <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
   <script type="text/javascript" src="js/underscore.js" ></script>
   <script type="text/javascript" src="js/backbone.js" ></script>
   <script type="text/javascript" src="js/miso.ds.deps.js"></script>
   <script type="text/javascript" src="js/d3.v2.min.js"></script>
   <script type="text/javascript" src="js/accounting.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
-  <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
   <script type="text/javascript">
     $('.chosen-select').chosen();
   </script>

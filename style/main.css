@@ -37,6 +37,7 @@ a {
   font-size: 24px;
   font-family: Georgia;
   width: 70%;
+  height: 5%;
   padding-top: 10px;
   margin: 0 auto;
 }
@@ -49,10 +50,21 @@ a {
 }
 
 #donut {
-  background-color: white;
-  width: 70%;
-  height: 75%;
+  width: 40%;
+  height: 50%;
   margin: 0 auto;
+  float: left;
+}
+
+#bar {
+  width: 60%;
+  height: 50%;
+  margin: 0 auto;
+  float: left;
+}
+
+.donutLabel {
+  font: 12px sans-serif;
 }
 
 .pageTitle {

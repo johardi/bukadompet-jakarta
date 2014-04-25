@@ -39,7 +39,26 @@ var COS = {
       type : "number",
       // Get rid the thousand separator symbols from nilai
       before : function(v) {
-         return (_.isUndefined(v) || _.isNull(v) || v == '-') ? 0 : parseFloat(v.replace(/\,/g, ''));
+         if (_.isUndefined(v) || _.isNull(v)) {
+            return 0
+         }
+         else {
+            v = v.replace(/\,/g, '');
+            return (isNaN(v)) ? 0 : parseFloat(v);
+         }
+      }
+   }, {
+      name : "realisasi",
+      type : "number",
+      // Get rid the thousand separator symbols from realisasi
+      before : function(v) {
+         if (_.isUndefined(v) || _.isNull(v)) {
+            return 0
+         }
+         else {
+            v = v.replace(/\,/g, '');
+            return (isNaN(v)) ? 0 : parseFloat(v);
+         }
       }
    } ],
 
@@ -135,23 +154,23 @@ var COS = {
       {
          // Define the underlying dataset for this interactive diagram.
          if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
-            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);		
-	        COS.Dataset.fetch(
-	        {
-	           success : function() {
-		          COS.header = new COS.Views.Header();
-	              COS.app = new COS.Views.Main();
-	              COS.header.render();
-	              COS.app.render();
-	           },
-	           error : function() {
-	              COS.app.views.title.update("Failed to load data from " + data.url);
-	           }
-	        });
+            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);      
+            COS.Dataset.fetch(
+            {
+               success : function() {
+                  COS.header = new COS.Views.Header();
+                  COS.app = new COS.Views.Main();
+                  COS.header.render();
+                  COS.app.render();
+               },
+               error : function() {
+                  COS.app.views.title.update("Failed to load data from " + data.url);
+               }
+            });
          }
          else {
-	        COS.app = new COS.Views.Main();
-	        COS.app.render();
+            COS.app = new COS.Views.Main();
+            COS.app.render();
          }
       },
 
@@ -159,23 +178,24 @@ var COS = {
       {
          // Define the underlying dataset for this interactive diagram.
          if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
-            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);		
-	        COS.Dataset.fetch(
-	        {
-	           success : function() {
-		          COS.header = new COS.Views.Header();
-	              COS.monitor = new COS.Views.Monitor();
-	              COS.header.render();
-	              COS.monitor.render();
-	           },
-	           error : function() {
-	              COS.app.views.title.update("Failed to load data from " + data.url);
-	           }
-	        });
+            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);      
+            COS.Dataset.fetch(
+            {
+               success : function() {
+                console.log(COS.Dataset);
+                 COS.header = new COS.Views.Header();
+                  COS.app = new COS.Views.Main();
+                  COS.header.render();
+                  COS.app.render();
+               },
+               error : function() {
+                  COS.app.views.title.update("Failed to load data from " + data.url);
+               }
+            });
          }
          else {
-	        COS.monitor = new COS.Views.Monitor();
-	        COS.monitor.render();
+            COS.app = new COS.Views.Main();
+            COS.app.render();
          }
       }
    })
@@ -188,9 +208,8 @@ COS.ResultParser = function(options) {};
 
 _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
    parse : function(data) {
-      // we really only want to grab a few data points from the entire
-      // api call result.
-      var columns     = ['year', 'SKPDNama', 'urusan', 'namaUrusan', 'program', 'programKode', 'namaProgram', 'kegiatanId', 'namaKegiatan', 'nilai'];
+      // we really only want to grab a few data points from the entire api call result.
+      var columns     = ['year', 'SKPDNama', 'urusan', 'namaUrusan', 'program', 'programKode', 'namaProgram', 'kegiatanId', 'namaKegiatan', 'nilai', 'realisasi'];
       var dataColumns = {
              year : [], 
              SKPDNama : [], 
@@ -201,7 +220,8 @@ _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
              namaProgram : [], 
              kegiatanId : [], 
              namaKegiatan : [], 
-             nilai : [] };
+             nilai : [],
+             realisasi : [] };
 
       var results = data.result;
 
@@ -216,6 +236,7 @@ _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
          dataColumns.kegiatanId.push(c.kegiatanId);
          dataColumns.namaKegiatan.push(c.namaKegiatan);
          dataColumns.nilai.push(c.nilai);
+         dataColumns.realisasi.push(c.realisasi);
       });
 
       return {
@@ -256,27 +277,12 @@ COS.Views.Main = Backbone.View.extend(
 
    render : function()
    {
-	  this.views.title = new COS.Views.Title();
+      this.views.title = new COS.Views.Title();
       this.views.treemap = new COS.Views.Treemap();
-
-      this.views.title.render();
-      this.views.treemap.render();
-   }
-});
-
-COS.Views.Monitor = Backbone.View.extend(
-{
-   initialize : function()
-   {
-      this.views = {};
-   },
-
-   render : function()
-   {
-	  this.views.title = new COS.Views.Title();
       this.views.donut = new COS.Views.Donut();
 
       this.views.title.render();
+      this.views.treemap.render();
       this.views.donut.render();
    }
 });
@@ -339,6 +345,7 @@ COS.Views.RegionSelection = Backbone.View.extend(
    {
       COS.state.currentRegion = $("option:selected", e.target).val();
       COS.app.views.treemap.render();
+      COS.app.views.donut.render();
    }
 });
 
@@ -376,12 +383,22 @@ COS.Views.SectorSelection = Backbone.View.extend(
       if (COS.state.currentSector == '1.20' && COS.state.currentYear == '2013') {
         COS.state.currentSector = '1.2';
       }
+      else if (COS.state.currentSector == '1.10' && COS.state.currentYear == '2013') {
+        COS.state.currentSector = '1.1';
+      }
+      else if (COS.state.currentSector == '1.2' && COS.state.currentYear == '2014') {
+        COS.state.currentSector = '1.20';
+      }
+      else if (COS.state.currentSector == '1.1' && COS.state.currentYear == '2014') {
+        COS.state.currentSector = '1.10';
+      }
 
       COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
       COS.Dataset.fetch(
       {
          success : function() {
             COS.app.views.treemap.render();
+            COS.app.views.donut.render();
          },
          error : function() {
             COS.app.views.title.update("Failed to load data from " + data.url);
@@ -424,8 +441,17 @@ COS.Views.YearPeriod = Backbone.View.extend({
    onChange : function(e)
    {
       COS.state.currentYear = $("option:selected", e.target).val();
-      if (COS.state.currentSector == '1.2' && COS.state.currentYear == '2014') {
+      if (COS.state.currentSector == '1.20' && COS.state.currentYear == '2013') {
+        COS.state.currentSector = '1.2';
+      }
+      else if (COS.state.currentSector == '1.10' && COS.state.currentYear == '2013') {
+        COS.state.currentSector = '1.1';
+      }
+      else if (COS.state.currentSector == '1.2' && COS.state.currentYear == '2014') {
         COS.state.currentSector = '1.20';
+      }
+      else if (COS.state.currentSector == '1.1' && COS.state.currentYear == '2014') {
+        COS.state.currentSector = '1.10';
       }
 
       COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
@@ -433,6 +459,7 @@ COS.Views.YearPeriod = Backbone.View.extend({
       {
          success : function() {
             COS.app.views.treemap.render();
+            COS.app.views.donut.render();
          },
          error : function() {
             COS.app.views.title.update("Failed to load data from " + data.url);
@@ -490,7 +517,7 @@ COS.Views.Treemap = Backbone.View.extend(
           maxGroups = COS.config.maxGroups;
 
       // Create a data subset that we are rendering
-      var groupedData = COS.Utils.computeGroupedData();
+      var dataset = COS.Utils.computeBudgetByProgram();
 
       // === build data for d3
       var expenseData =
@@ -499,7 +526,7 @@ COS.Views.Treemap = Backbone.View.extend(
          elements : []
       };
 
-      groupedData.each(function(row, index) {
+      dataset.each(function(row, index) {
          if (index >= maxGroups) {
             return;
          }
@@ -512,8 +539,7 @@ COS.Views.Treemap = Backbone.View.extend(
       });
 
       // Build a treemap chart using the supplied data.
-      // - Add labels to each cell, applying dynamic styling according to
-      //   the space available.
+      // - Add labels to each cell, applying dynamic styling according to the space available.
       // - Bind custom handlers to cell highlighting and selection events.
       this.$el.empty();
       var selected = null;
@@ -584,8 +610,7 @@ COS.Views.Treemap = Backbone.View.extend(
          console.log(d, selected);
       })
 
-      // on mouseover, fade all cells except the one being
-      // selected.
+      // on mouseover, fade all cells except the one being selected.
       .on("mouseover", function(d)
       {
          // update Title.
@@ -602,8 +627,7 @@ COS.Views.Treemap = Backbone.View.extend(
       })
       .append("p")
 
-      // set the size for the labels for the dollar amount.
-      // vary size based on size.
+      // set the size for the labels for the rupiah amount.
       .call(function()
       {
          this.attr("class", "tag").style("font-size", function(d) {
@@ -637,6 +661,7 @@ COS.Views.Donut = Backbone.View.extend(
    {
       this.width = $("#donut").width();
       this.height = $("#donut").height();
+      this.radius = Math.min(this.width, this.height) / 2;
       this.setElement($(this.el));
    },
 
@@ -670,7 +695,56 @@ COS.Views.Donut = Backbone.View.extend(
 
    render : function() 
    {
-      // NO-OP
+      var dataset = COS.Utils.computeBudgetSpendingData();
+
+      var spendingData = [];
+
+      dataset.each(function(row, index) {
+         spendingData[0] = row["realisasi"],
+         spendingData[1] = row["nilai"] - row["realisasi"]
+      });
+      
+      var labels = ['Realisasi', 'Sisa Anggaran'];
+
+      this.$el.empty();
+
+      var color = d3.scale.category20();
+
+      var pie = d3.layout.pie().sort(null);
+
+      var arc = d3.svg.arc()
+                  .innerRadius(this.radius - 120)
+                  .outerRadius(this.radius - 30);
+
+      var svg = d3.select("#donut").append("svg")
+                  .attr("width", this.width)
+                  .attr("height", this.height);
+
+      var donut = svg.append("g")
+                  .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+
+      var label = svg.append("g")
+                  .attr("class", "label")
+                  .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+     
+      var donutPath = donut.selectAll("path")
+                  .data(pie(spendingData))
+                  .enter().append("path")
+                  .attr("fill", function(d, i) { return color(i); })
+                  .attr("d", arc);
+
+      var donutLabel = label.selectAll("text")
+                  .data(pie(spendingData));
+      
+      donutLabel.enter().append("text")
+                  .attr("class", "donutLabel")
+                  .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
+                  .attr("text-anchor", "middle")
+                  .text(function(d, i) { return labels[i]; } );
+
+      // some graceful animation
+      this._hideGroup("#donut");
+      this._showGroup("#donut", 300, 10);
    }
 });
 
@@ -705,13 +779,10 @@ COS.Utils =
    },
 
    // Compute grouped data for a specific range, by the grouping.
-   computeGroupedData : function() {
+   computeBudgetByProgram : function() {
       // load state
-      var period = COS.state.currentYear,
-          region = COS.state.currentRegion,
-          sector = COS.state.currentSector,
+      var region = COS.state.currentRegion,
           grouping = COS.state.currentGrouping,
-          maxGroups = COS.config.maxGroups,
 
       // How are we selecting rows from the dataset
       dataSlice = function(row) {
@@ -719,9 +790,9 @@ COS.Utils =
          return regionRegex.test(row["SKPDNama"]);
       };
 
-      var groupedData = COS.Dataset.rows(dataSlice).groupBy(grouping, ["nilai"]);
+      var dataset = COS.Dataset.rows(dataSlice).groupBy(grouping, ["nilai"]);
 
-      groupedData.sort(
+      dataset.sort(
       {
          comparator : function(a, b) {
             if (b["nilai"] > a["nilai"]) {
@@ -736,7 +807,22 @@ COS.Utils =
          }
       });
 
-      return groupedData;
+      return dataset;
+   },
+
+   computeBudgetSpendingData : function() {
+      // load state
+      var region = COS.state.currentRegion,
+
+      // How are we selecting rows from the dataset
+      dataSlice = function(row) {
+         var regionRegex = new RegExp(region);
+         return regionRegex.test(row["SKPDNama"]);
+      };
+
+      var dataset = COS.Dataset.rows(dataSlice).groupBy("urusan", ["nilai", "realisasi"]);
+
+      return dataset;
    }
 };
 
