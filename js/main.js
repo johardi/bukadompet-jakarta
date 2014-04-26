@@ -182,8 +182,7 @@ var COS = {
             COS.Dataset.fetch(
             {
                success : function() {
-                console.log(COS.Dataset);
-                 COS.header = new COS.Views.Header();
+                  COS.header = new COS.Views.Header();
                   COS.app = new COS.Views.Main();
                   COS.header.render();
                   COS.app.render();
@@ -278,12 +277,16 @@ COS.Views.Main = Backbone.View.extend(
    render : function()
    {
       this.views.title = new COS.Views.Title();
+      this.views.budgetBarTitle = new COS.Views.BudgetBarTitle();
       this.views.treemap = new COS.Views.Treemap();
       this.views.donut = new COS.Views.Donut();
+      this.views.stackedBar = new COS.Views.StackedBar();
 
       this.views.title.render();
+      this.views.budgetBarTitle.render();
       this.views.treemap.render();
       this.views.donut.render();
+      this.views.stackedBar.render();
    }
 });
 
@@ -294,6 +297,32 @@ COS.Views.Title = Backbone.View.extend(
    {
       options = options || {};
       this.defaultMessage = "Anggaran Belanja Daerah DKI Jakarta";
+      this.message = options.message || this.defaultMessage;
+      this.setElement($(this.el));
+   },
+   render : function()
+   {
+      this.$el.html(this.message);
+   },
+   update : function(message)
+   {
+      if (typeof message !== "undefined") {
+         this.message = message;
+      }
+      else {
+         this.message = this.defaultMessage;
+      }
+      this.render();
+   }
+});
+
+COS.Views.BudgetBarTitle = Backbone.View.extend(
+{
+   el : "#budgetBarLegend",
+   initialize : function(options)
+   {
+      options = options || {};
+      this.defaultMessage = "Alokasi dan Realisasi Anggaran Belanja Daerah DKI Jakarta";
       this.message = options.message || this.defaultMessage;
       this.setElement($(this.el));
    },
@@ -399,6 +428,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
          success : function() {
             COS.app.views.treemap.render();
             COS.app.views.donut.render();
+            COS.app.views.stackedBar.render();
          },
          error : function() {
             COS.app.views.title.update("Failed to load data from " + data.url);
@@ -460,6 +490,7 @@ COS.Views.YearPeriod = Backbone.View.extend({
          success : function() {
             COS.app.views.treemap.render();
             COS.app.views.donut.render();
+            COS.app.views.stackedBar.render();
          },
          error : function() {
             COS.app.views.title.update("Failed to load data from " + data.url);
@@ -473,12 +504,12 @@ COS.Views.YearPeriod = Backbone.View.extend({
  */
 COS.Views.Treemap = Backbone.View.extend(
 {
-   el : "#chart",
+   el : "#budgetChart",
 
    initialize : function(options)
    {
-      this.width = $("#chart").width();
-      this.height = $("#chart").height();
+      this.width = $("#budgetChart").width();
+      this.height = $("#budgetChart").height();
       this.setElement($(this.el));
    },
 
@@ -562,7 +593,7 @@ COS.Views.Treemap = Backbone.View.extend(
       //           .attr("width", m_width)
       //           .attr("height", m_width * this.height / this.width).append("div")
 
-      var chart = d3.select("#chart").append("div")
+      var chart = d3.select("#budgetChart").append("div")
         
       // set default styles for chart
       .call(function()
@@ -645,22 +676,23 @@ COS.Views.Treemap = Backbone.View.extend(
       });
 
       // some graceful animation
-      this._hideGroup("#chart .cell");
-      this._showGroup("#chart .cell", 300, 10);
+      this._hideGroup("#budgetChart .cell");
+      this._showGroup("#budgetChart .cell", 300, 10);
    }
 });
 
 /**
- * A tree map, uses d3.
+ * A donut chart to present the overall budget comparison between the actual spending
+ * against the budget reminder.
  */
 COS.Views.Donut = Backbone.View.extend(
 {
-   el : "#donut",
+   el : "#budgetDonut",
 
    initialize : function(options)
    {
-      this.width = $("#donut").width();
-      this.height = $("#donut").height();
+      this.width = $("#budgetDonut").width();
+      this.height = $("#budgetDonut").height();
       this.radius = Math.min(this.width, this.height) / 2;
       this.setElement($(this.el));
    },
@@ -695,7 +727,7 @@ COS.Views.Donut = Backbone.View.extend(
 
    render : function() 
    {
-      var dataset = COS.Utils.computeBudgetSpendingData();
+      var dataset = COS.Utils.computeBudgetSpendingBySector();
 
       var spendingData = [];
 
@@ -716,7 +748,7 @@ COS.Views.Donut = Backbone.View.extend(
                   .innerRadius(this.radius - 120)
                   .outerRadius(this.radius - 30);
 
-      var svg = d3.select("#donut").append("svg")
+      var svg = d3.select("#budgetDonut").append("svg")
                   .attr("width", this.width)
                   .attr("height", this.height);
 
@@ -743,8 +775,142 @@ COS.Views.Donut = Backbone.View.extend(
                   .text(function(d, i) { return labels[i]; } );
 
       // some graceful animation
-      this._hideGroup("#donut");
-      this._showGroup("#donut", 300, 10);
+      this._hideGroup("#budgetDonut");
+      this._showGroup("#budgetDonut", 300, 10);
+   }
+});
+
+/**
+ * A bar chart to present the budget of each program between the actual spending
+ * against the budget reminder.
+ */
+COS.Views.StackedBar = Backbone.View.extend(
+{
+   el : "#budgetBarImg",
+
+   initialize : function(options)
+   {
+      this.width = $("#budgetBarImg").width();
+      this.height = $("#budgetBarImg").height();
+      this.setElement($(this.el));
+   },
+
+   _hideGroup : function(elType, fadeTime, offset)
+   {
+      if (fadeTime) {
+         offset = offset || 0;
+         $(elType).each(function(index)
+         {
+            $(this).delay(offset * index).fadeOut(fadeTime);
+         });
+      }
+      else {
+         $(elType).hide();
+      }
+   },
+
+   _showGroup : function(elType, fadeTime, offset)
+   {
+      if (fadeTime) {
+         offset = offset || 0;
+         $(elType).each(function(index)
+         {
+            $(this).delay(offset * index).fadeIn(fadeTime);
+         });
+      }
+      else {
+         $(elType).show();
+      }
+   },
+
+   render : function() 
+   {
+      var dataset = COS.Utils.computeBudgetSpendingByProgram();
+      var spendingData = [];
+
+      dataset.each(function(row, index) {
+         var inner = [];
+         inner[0] = row["namaProgram"],
+         inner[1] = row["nilai"],
+         inner[2] = row["realisasi"],
+         spendingData[index] = inner
+      });
+      // var labels = ['Realisasi', 'Sisa Anggaran'];
+
+      var remapped = ["c1", "c2"].map(function(dat, i) {
+         return spendingData.map(function(d, ii) {
+            return { x: d[i], y: d[i+1] };
+         })
+      });
+
+      x = d3.scale.ordinal().rangeRoundBands([0, this.width - 50])
+      y = d3.scale.linear().range([0, this.height - 50])
+      z = d3.scale.category20();
+    
+      this.$el.empty();
+	console.log(remapped);
+
+      var stacked = d3.layout.stack()(remapped);
+
+
+console.log(stacked);
+      x.domain(stacked[0].map(function(d) { return d.x; }));
+      y.domain([0, d3.max(stacked[stacked.length - 1], function(d) {
+         return d.y0 + d.y;
+      })]);
+
+      var svg = d3.select("#budgetBarImg").append("svg")
+                  .attr("width", this.width)
+                  .attr("height", this.height);
+
+      var stackedBar = svg.append("g")
+                  .attr("transform", "translate(" + 40 + "," + (this.height - 40) + ")");
+
+      var valGroup = stackedBar.selectAll("g.valgroup")
+           .data(stacked)
+           .enter().append("g")
+           .attr("class", "valgroup")
+           .style("fill", function(d, i) { return z(i); })
+           .style("stroke", function(d, i) { return d3.rgb(z(i)).darker(); });
+      
+      var rect = valGroup.selectAll("rect")
+           .data(function(d) { return d; })
+           .enter().append("rect")
+           .attr("class", "bar")
+           .attr("x", function(d) { return x(d.x); })
+           .attr("y", function(d) { return -y(d.y0) - y(d.y); })
+           .attr("height", function(d) { return y(d.y); })
+           .attr("width", x.rangeBand());           
+
+      // on mouse over, fade the graphic bar
+      rect.on("mouseover", function(d)
+	  {
+		console.log(d);
+		 COS.app.views.budgetBarTitle.update(COS.Utils.toTitleCase(d.x) + " - " + COS.Utils.toMoney(d.y.toFixed(0)));
+         $(".bar").stop().fadeTo(300, 0.2);
+         $(this).stop().fadeTo(0, 1.0);
+      })
+
+      // on mouse out, unfade all bars.
+      .on("mouseout", function(d)
+      {
+         $(".bar").stop().fadeTo("fast", 1.0);
+         COS.app.views.title.update();
+      })
+      .append("p")
+ 
+      // var donutLabel = label.selectAll("text")
+      //             .data(pie(spendingData));
+      // 
+      // donutLabel.enter().append("text")
+      //             .attr("class", "donutLabel")
+      //             .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
+      //             .attr("text-anchor", "middle")
+      //             .text(function(d, i) { return labels[i]; } );
+
+      // some graceful animation
+      this._hideGroup("#budgetBarImg");
+      this._showGroup("#budgetBarImg", 300, 10);
    }
 });
 
@@ -755,7 +921,8 @@ COS.Utils =
    createDataset : function(sector, year) {
       return new Miso.Dataset(
       {
-         url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
+         url : "data/data24.json",
+         // url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
          columns : COS.columns,
          parser : COS.ResultParser,
       });
@@ -810,7 +977,7 @@ COS.Utils =
       return dataset;
    },
 
-   computeBudgetSpendingData : function() {
+   computeBudgetSpendingBySector : function() {
       // load state
       var region = COS.state.currentRegion,
 
@@ -821,6 +988,37 @@ COS.Utils =
       };
 
       var dataset = COS.Dataset.rows(dataSlice).groupBy("urusan", ["nilai", "realisasi"]);
+
+      return dataset;
+   },
+
+   computeBudgetSpendingByProgram : function() {
+      // load state
+      var region = COS.state.currentRegion,
+          grouping = COS.state.currentGrouping,
+
+      // How are we selecting rows from the dataset
+      dataSlice = function(row) {
+         var regionRegex = new RegExp(region);
+         return regionRegex.test(row["SKPDNama"]);
+      };
+
+      var dataset = COS.Dataset.rows(dataSlice).groupBy(grouping, ["nilai", "realisasi"]);
+
+      dataset.sort(
+      {
+         comparator : function(a, b) {
+            if (b["nilai"] > a["nilai"]) {
+               return 1;
+            }
+            if (b["nilai"] < a["nilai"]) {
+               return -1;
+            }
+            if (b["nilai"] === a["nilai"]) {
+               return 0;
+            }
+         }
+      });
 
       return dataset;
    }

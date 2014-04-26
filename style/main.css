@@ -42,25 +42,35 @@ a {
   margin: 0 auto;
 }
 
-#chart {
+#budgetChart {
   background-color: white;
   width: 70%;
-  height: 75%;
+  height: 70%;
   margin: 0 auto;
 }
 
-#donut {
+#budgetDonut {
   width: 40%;
   height: 50%;
   margin: 0 auto;
   float: left;
 }
 
-#bar {
+#budgetBar {
   width: 60%;
   height: 50%;
   margin: 0 auto;
   float: left;
+}
+
+#budgetBarImg {
+  width: 100%;
+  height: 90%;
+}
+
+#budgetBarLegend {
+  width: 100%;
+  height: 10%;
 }
 
 .donutLabel {
