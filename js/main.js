@@ -146,8 +146,8 @@ var COS = {
    { 
       routes : {
          "" : "index",
-         "main" : "index",
-         "realisasi" : "monitor"
+         "utama" : "index",
+         "realisasi" : "realisation"
       },
 
       index : function()
@@ -174,7 +174,7 @@ var COS = {
          }
       },
 
-      monitor : function()
+      realisation : function()
       {
          // Define the underlying dataset for this interactive diagram.
          if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
@@ -318,7 +318,7 @@ COS.Views.Title = Backbone.View.extend(
 
 COS.Views.BudgetBarTitle = Backbone.View.extend(
 {
-   el : "#budgetBarLegend",
+   el : "#budgetBarTitle",
    initialize : function(options)
    {
       options = options || {};
@@ -375,6 +375,7 @@ COS.Views.RegionSelection = Backbone.View.extend(
       COS.state.currentRegion = $("option:selected", e.target).val();
       COS.app.views.treemap.render();
       COS.app.views.donut.render();
+      COS.app.views.stackedBar.render();
    }
 });
 
@@ -422,6 +423,8 @@ COS.Views.SectorSelection = Backbone.View.extend(
         COS.state.currentSector = '1.10';
       }
 
+      COS.Utils.showProgressSpinner();
+
       COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
       COS.Dataset.fetch(
       {
@@ -458,13 +461,13 @@ COS.Views.YearPeriod = Backbone.View.extend({
    },
 
    render : function()
-   {
-      this.$el.addClass('dropdown');
+   {    
+      this.$el.addClass("dropdown");
       this.$el.parent().show();
       this.$el.html(this.template({
          yearPeriods : this.periods
       }));
-      this.$el.trigger('chosen:updated')
+      this.$el.trigger('chosen:updated');
       return this;
    },
 
@@ -483,6 +486,8 @@ COS.Views.YearPeriod = Backbone.View.extend({
       else if (COS.state.currentSector == '1.1' && COS.state.currentYear == '2014') {
         COS.state.currentSector = '1.10';
       }
+
+      COS.Utils.showProgressSpinner();
 
       COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);
       COS.Dataset.fetch(
@@ -732,11 +737,11 @@ COS.Views.Donut = Backbone.View.extend(
       var spendingData = [];
 
       dataset.each(function(row, index) {
-         spendingData[0] = row["realisasi"],
-         spendingData[1] = row["nilai"] - row["realisasi"]
+         spendingData[0] = row["nilai"] - row["realisasi"],
+         spendingData[1] = row["realisasi"]
       });
       
-      var labels = ['Realisasi', 'Sisa Anggaran'];
+      var labels = ["Sisa Anggaran", "Realisasi"];
 
       this.$el.empty();
 
@@ -772,7 +777,11 @@ COS.Views.Donut = Backbone.View.extend(
                   .attr("class", "donutLabel")
                   .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
                   .attr("text-anchor", "middle")
-                  .text(function(d, i) { return labels[i]; } );
+                  .text(function(d, i) { 
+	                 if (d.value !== 0) { 
+	                    return labels[i];
+                     }
+	              });
 
       // some graceful animation
       this._hideGroup("#budgetDonut");
@@ -835,25 +844,23 @@ COS.Views.StackedBar = Backbone.View.extend(
          inner[2] = row["realisasi"],
          spendingData[index] = inner
       });
-      // var labels = ['Realisasi', 'Sisa Anggaran'];
 
-      var remapped = ["c1", "c2"].map(function(dat, i) {
+      var remapped = ["Alokasi Anggaran", "Realisasi"].map(function(dat, i) {
          return spendingData.map(function(d, ii) {
-            return { x: d[i], y: d[i+1] };
+            return { x: d[0], y: d[i+1], percent: d[i+1] * 100 / (d[1] + d[2]), label: dat };
          })
       });
 
       x = d3.scale.ordinal().rangeRoundBands([0, this.width - 50])
       y = d3.scale.linear().range([0, this.height - 50])
       z = d3.scale.category20();
-    
+      colors = [ ["Alokasi Anggaran", "#1f77b4"],
+                 ["Realisasi", "#aec7e8"] ];
+
       this.$el.empty();
-	console.log(remapped);
 
       var stacked = d3.layout.stack()(remapped);
 
-
-console.log(stacked);
       x.domain(stacked[0].map(function(d) { return d.x; }));
       y.domain([0, d3.max(stacked[stacked.length - 1], function(d) {
          return d.y0 + d.y;
@@ -861,12 +868,11 @@ console.log(stacked);
 
       var svg = d3.select("#budgetBarImg").append("svg")
                   .attr("width", this.width)
-                  .attr("height", this.height);
-
-      var stackedBar = svg.append("g")
+                  .attr("height", this.height)
+                  .append("g")
                   .attr("transform", "translate(" + 40 + "," + (this.height - 40) + ")");
 
-      var valGroup = stackedBar.selectAll("g.valgroup")
+      var valGroup = svg.selectAll("g.valgroup")
            .data(stacked)
            .enter().append("g")
            .attr("class", "valgroup")
@@ -884,9 +890,9 @@ console.log(stacked);
 
       // on mouse over, fade the graphic bar
       rect.on("mouseover", function(d)
-	  {
-		console.log(d);
-		 COS.app.views.budgetBarTitle.update(COS.Utils.toTitleCase(d.x) + " - " + COS.Utils.toMoney(d.y.toFixed(0)));
+      {
+        console.log(d);
+         COS.app.views.budgetBarTitle.update(COS.Utils.toTitleCase(d.x) + " - " + COS.Utils.toMoney(d.y.toFixed(0)));
          $(".bar").stop().fadeTo(300, 0.2);
          $(this).stop().fadeTo(0, 1.0);
       })
@@ -899,14 +905,41 @@ console.log(stacked);
       })
       .append("p")
  
-      // var donutLabel = label.selectAll("text")
-      //             .data(pie(spendingData));
-      // 
-      // donutLabel.enter().append("text")
-      //             .attr("class", "donutLabel")
-      //             .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
-      //             .attr("text-anchor", "middle")
-      //             .text(function(d, i) { return labels[i]; } );
+      var legend = svg.append("g")
+            .attr("class", "barLegend")
+            .attr("height", 100)
+            .attr("width", 100)
+            .attr("transform", "translate(" + -150 + "," + (-this.height + 50) + ")");
+
+      var legendRect = legend.selectAll('rect').data(colors);
+
+      legendRect.enter()
+          .append("rect")
+          .attr("x", this.width - 65)
+          .attr("width", 10)
+          .attr("height", 10);
+    
+      legendRect
+          .attr("y", function(d, i) {
+             return i * 20;
+          })
+          .style("fill", function(d) {
+             return d[1];
+          });
+
+      var legendText = legend.selectAll('text').data(colors);
+
+      legendText.enter()
+          .append("text")
+          .attr("x", this.width - 52);
+
+      legendText
+          .attr("y", function(d, i) {
+             return i * 20 + 9;
+          })
+          .text(function(d) {
+             return d[0];
+          });
 
       // some graceful animation
       this._hideGroup("#budgetBarImg");
@@ -921,11 +954,20 @@ COS.Utils =
    createDataset : function(sector, year) {
       return new Miso.Dataset(
       {
-         url : "data/data24.json",
-         // url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
+         // url : "data/apbd-jakarta.json",
+         url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
          columns : COS.columns,
          parser : COS.ResultParser,
       });
+   },
+
+   showProgressSpinner : function() {
+      $("#budgetChart").empty();
+      $("#budgetDonut").empty();
+      $("#budgetBarImg").empty();
+      $("#budgetChart").append("<i id=\"spinner\" class=\"fa fa-refresh fa-spin fa-3x\"></i>");  
+      $("#budgetDonut").append("<i id=\"spinner\" class=\"fa fa-refresh fa-spin fa-3x\"></i>");  
+      $("#budgetBarImg").append("<i id=\"spinner\" class=\"fa fa-refresh fa-spin fa-3x\"></i>");     
    },
 
    // Return the string supplied with its first character converted to upper case

@@ -67,7 +67,7 @@
   <!-- Page content -->
   <div id="fullpage">  
     <div id="utama" class="section">
-      <div id="budgetChart"><i class="fa fa-refresh fa-spin fa-3x"></i></div>
+      <div id="budgetChart"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
       <div id="legend">
          Memuat Data Anggaran...
       </div>
@@ -76,7 +76,7 @@
       <div id="budgetDonut"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
       <div id="budgetBar">
 	     <div id="budgetBarImg"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
-	     <div id="budgetBarLegend"></div>
+	     <div id="budgetBarTitle"></div>
 	  </div>
     </div>
   </div>
@@ -93,7 +93,9 @@
   <script type="text/javascript" src="js/accounting.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
   <script type="text/javascript">
-    $('.chosen-select').chosen();
+	if (!('ontouchstart' in document.documentElement)) {
+       $('.chosen-select').chosen();
+	}    
   </script>
   </body>
 </html>
