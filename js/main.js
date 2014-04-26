@@ -590,21 +590,13 @@ COS.Views.Treemap = Backbone.View.extend(
          return d.total;
       });
 
-      // var m_width = $("#chart").width();
-      // 
-      // var chart = d3.select("#chart").append("svg")
-      //           .attr("preserveAspectRatio", "xMidYMid")
-      //           .attr("viewBox", "0 0 " + this.width + " " + this.height)
-      //           .attr("width", m_width)
-      //           .attr("height", m_width * this.height / this.width).append("div")
-
       var chart = d3.select("#budgetChart").append("div")
         
       // set default styles for chart
       .call(function()
       {
          this.attr("class", "chart")
-         .style("position", "relative");
+             .style("position", "relative");
       });
 
       // set up data for the chart
