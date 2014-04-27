@@ -40,7 +40,7 @@ var COS = {
       // Get rid the thousand separator symbols from nilai
       before : function(v) {
          if (_.isUndefined(v) || _.isNull(v)) {
-            return 0
+            return 0;
          }
          else {
             v = v.replace(/\,/g, '');
@@ -53,7 +53,7 @@ var COS = {
       // Get rid the thousand separator symbols from realisasi
       before : function(v) {
          if (_.isUndefined(v) || _.isNull(v)) {
-            return 0
+            return 0;
          }
          else {
             v = v.replace(/\,/g, '');
@@ -365,7 +365,7 @@ COS.Views.RegionSelection = Backbone.View.extend(
       this.$el.html(this.template({
          selections : this.regions
       }));
-      this.$el.trigger('chosen:updated')
+      this.$el.trigger('chosen:updated');
       return this;
    },
 
@@ -402,7 +402,7 @@ COS.Views.SectorSelection = Backbone.View.extend(
       this.$el.html(this.template({
          selections : this.sectors
       }));
-      this.$el.trigger('chosen:updated')
+      this.$el.trigger('chosen:updated');
       return this;
    },
 
@@ -730,7 +730,7 @@ COS.Views.Donut = Backbone.View.extend(
 
       dataset.each(function(row, index) {
          spendingData[0] = row["nilai"] - row["realisasi"],
-         spendingData[1] = row["realisasi"]
+         spendingData[1] = row["realisasi"];
       });
       
       var labels = ["SISA ALOKASI", "REALISASI"];
@@ -859,7 +859,7 @@ COS.Views.StackedBar = Backbone.View.extend(
        var color = d3.scale.ordinal()
            .range(["#1f77b4", "#aec7e8"]);
    
-       var legends = [ 
+       var legends = [
            ["Alokasi Anggaran", "#1f77b4"],
            ["Realisasi", "#aec7e8"] ];
        
@@ -880,7 +880,7 @@ COS.Views.StackedBar = Backbone.View.extend(
              "nilai" : row["nilai"],
              "realisasi" : row["realisasi"]
          };
-         spendingData[index] = inner
+         spendingData[index] = inner;
       });
 
       color.domain(d3.keys(spendingData[0]).filter(function(key) { return key !== "program"; }));
