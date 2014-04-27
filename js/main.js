@@ -1,8 +1,33 @@
-// namespace
+/*
+ * BukaDompet.Jakarta | A dashboard application that displays data visualisation
+ * for the Jakarta budget spending. It shows a simpel yet comprehensive reporting
+ * for the budget alocation and spending.
+ */
+
+/* 
+ * Copyright 2014 Josef Hardi <josef.hardi@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var COS = {
-   // default endpoint address
+   /*
+    * Default endpoint address
+    */
    endpointUrl : "http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=pNv2ktU89DC8PeD7fO3wT1BAWD9nNome",
 
+   /*
+    * Data columns used by this application
+    */
    columns : [ {
       name : "year",
       type : "number"
@@ -24,7 +49,7 @@ var COS = {
    }, {
       name : "namaProgram",
       type : "string",
-      // Get rid the bullet number from namaProgram
+      // Get rid the bullet number from text
       before : function(v) {
          return v.replace(/^\s*[0-9]+\.\s*/, '');
       }
@@ -37,7 +62,7 @@ var COS = {
    }, {
       name : "nilai",
       type : "number",
-      // Get rid the thousand separator symbols from nilai
+      // Get rid the thousand separator symbols from text
       before : function(v) {
          if (_.isUndefined(v) || _.isNull(v)) {
             return 0;
@@ -50,7 +75,7 @@ var COS = {
    }, {
       name : "realisasi",
       type : "number",
-      // Get rid the thousand separator symbols from realisasi
+      // Get rid the thousand separator symbols from text
       before : function(v) {
          if (_.isUndefined(v) || _.isNull(v)) {
             return 0;
@@ -62,9 +87,10 @@ var COS = {
       }
    } ],
 
-   // configuration parameters that are used throughout the application:
+   /*
+    * Configuration parameters that are used throughout the application.
+    */
    config : {
-      // default dates, all.
       yearPeriod : [ "2013", "2014" ],
 
       regions : [
@@ -121,38 +147,49 @@ var COS = {
             "#6A246D", "#8A4873", "#EB0080", "#EF58A0", "#C05A89" ]
    },
 
-   // state management
+   /*
+    * Application state management
+    */
    state : {
-      // Store the year of the currently selected period
+      // Store the year of the currently selected period: "2013"
       currentYear : "2013",
 
       // Store the name of the "urusan" by which the data is initially sliced: "Pendidikan"
       currentSector : "1.01",
 
-      // Store the name of the region by which the data is initially sliced: "ALL"
+      // Store the name of the region by which the data is initially sliced: "Semua Wilayah"
       currentRegion : ".",
 
       // Store the name of the column by which the data is initially grouped: "namaProgram"
       currentGrouping : "namaProgram"
    },
 
+   /*
+    * Application dataset for local processing
+    */
    Dataset : {},
 
-   // container for our application views
+   /*
+    * Application view for page presentation
+    */
    Views : {},
 
-   // application router
+   /*
+    * Application router for receiving request
+    */
    Router : Backbone.Router.extend(
    { 
       routes : {
          "" : "index",
          "utama" : "index",
-         "realisasi" : "realisation"
+         "realisasi" : "index"
       },
 
       index : function()
       {
-         // Define the underlying dataset for this interactive diagram.
+         /*
+          * Define the underlying dataset for this interactive diagram. Users can enter from any page address.
+          */
          if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
             COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);      
             COS.Dataset.fetch(
@@ -169,30 +206,7 @@ var COS = {
             });
          }
          else {
-            COS.app = new COS.Views.Main();
-            COS.app.render();
-         }
-      },
-
-      realisation : function()
-      {
-         // Define the underlying dataset for this interactive diagram.
-         if (_.isUndefined(COS.Dataset) || _.isNull(COS.Dataset) || _.isEmpty(COS.Dataset)) {
-            COS.Dataset = COS.Utils.createDataset(COS.state.currentSector, COS.state.currentYear);      
-            COS.Dataset.fetch(
-            {
-               success : function() {
-                  COS.header = new COS.Views.Header();
-                  COS.app = new COS.Views.Main();
-                  COS.header.render();
-                  COS.app.render();
-               },
-               error : function() {
-                  COS.app.views.title.update("Failed to load data from " + data.url);
-               }
-            });
-         }
-         else {
+	        // If dataset already exists then just re-render the main view.
             COS.app = new COS.Views.Main();
             COS.app.render();
          }
@@ -201,13 +215,15 @@ var COS = {
 };
 
 /**
- * Application parser
+ * Application parser from JSON to Miso Dataset object.
  */
 COS.ResultParser = function(options) {};
 
 _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
    parse : function(data) {
-      // we really only want to grab a few data points from the entire api call result.
+      /*
+       * We really only want to grab a few data points from the entire api call result.
+       */
       var columns     = ['year', 'SKPDNama', 'urusan', 'namaUrusan', 'program', 'programKode', 'namaProgram', 'kegiatanId', 'namaKegiatan', 'nilai', 'realisasi'];
       var dataColumns = {
              year : [], 
@@ -245,6 +261,9 @@ _.extend(COS.ResultParser.prototype, Miso.Parsers.prototype, {
    }
 });
 
+/*
+ * Application header that displays option selectors: Regions, Programs and Years.
+ */
 COS.Views.Header = Backbone.View.extend(
 {
    initialize : function()
@@ -264,7 +283,7 @@ COS.Views.Header = Backbone.View.extend(
    }
 });
 
-/**
+/*
  * Main application view
  */
 COS.Views.Main = Backbone.View.extend(
@@ -290,6 +309,9 @@ COS.Views.Main = Backbone.View.extend(
    }
 });
 
+/*
+ * View for handling title for the main budget alocation chart.
+ */
 COS.Views.Title = Backbone.View.extend(
 {
    el : "#legend",
@@ -316,6 +338,9 @@ COS.Views.Title = Backbone.View.extend(
    }
 });
 
+/*
+ * Another view for handling title for the budget alocation/realisation chart.
+ */
 COS.Views.BudgetBarTitle = Backbone.View.extend(
 {
    el : "#budgetBarTitle",
@@ -342,6 +367,9 @@ COS.Views.BudgetBarTitle = Backbone.View.extend(
    }
 });
 
+/*
+ * View for handling the dropdown containing all possible region options
+ */
 COS.Views.RegionSelection = Backbone.View.extend(
 {
    el : "#region",
@@ -379,6 +407,9 @@ COS.Views.RegionSelection = Backbone.View.extend(
    }
 });
 
+/*
+ * View for handling the dropdown containing all possible sector options
+ */
 COS.Views.SectorSelection = Backbone.View.extend(
 {
    el : "#sector",
@@ -440,8 +471,8 @@ COS.Views.SectorSelection = Backbone.View.extend(
    }
 });
 
-/**
- * Date range dropdown containing all possible values.
+/*
+ * View for handling the dropdown containing all possible year options
  */
 COS.Views.YearPeriod = Backbone.View.extend({
 
@@ -504,8 +535,8 @@ COS.Views.YearPeriod = Backbone.View.extend({
    }
 });
 
-/**
- * A tree map, uses d3.
+/*
+ * View for handling the construction of the main budget alocation chart.
  */
 COS.Views.Treemap = Backbone.View.extend(
 {
@@ -777,22 +808,22 @@ COS.Views.Donut = Backbone.View.extend(
                   });
 
       var center_group = svg.append("g")
-	      .attr("class", "ctrGroup")
-	      .attr("transform", "translate(" + (this.width / 2) + "," + (this.height / 2) + ")");
+          .attr("class", "ctrGroup")
+          .attr("transform", "translate(" + (this.width / 2) + "," + (this.height / 2) + ")");
 
-      // on mouse over, fade the graphic bar
-	  donutPath.on("mouseover", function(d)
-	  { 
-		 var value = d.value;
-		 $(".donutSegment").stop().fadeTo(300, 0.2);
+      // on mouse over, fade the graphic segment
+      donutPath.on("mouseover", function(d)
+      { 
+         var value = d.value;
+         $(".donutSegment").stop().fadeTo(300, 0.2);
          $(this).stop().fadeTo(0, 1.0);
-	     center_group.append("text")
-		     .attr("dy", ".35em").attr("class", "budgetChartLabel")
-		     .attr("text-anchor", "middle")
-		     .text(function(d) { return COS.Utils.toMoney(value.toFixed(0)); });
-	  })
+         center_group.append("text")
+             .attr("dy", ".35em").attr("class", "budgetChartLabel")
+             .attr("text-anchor", "middle")
+             .text(function(d) { return COS.Utils.toMoney(value.toFixed(0)); });
+      })
 
-      // on mouse out, unfade all bars.
+      // on mouse out, unfade all segments.
       .on("mouseout", function(d)
       {
          $(".donutSegment").stop().fadeTo("fast", 1.0);
@@ -999,13 +1030,13 @@ COS.Utils =
    createDataset : function(sector, year) {
       return new Miso.Dataset(
       {
-         url : "data/data24.json",
-         // url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
+         url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
          columns : COS.columns,
          parser : COS.ResultParser,
       });
    },
 
+   // Show the progress spin while loading the data
    showProgressSpinner : function() {
       $("#budgetChart").empty();
       $("#budgetDonut").empty();
@@ -1028,13 +1059,11 @@ COS.Utils =
          thousand : ".",
          precision : 0
       };
-      // we are using the accounting library
       return accounting.formatMoney(amount, options);
    },
 
    // Compute grouped data for a specific range, by the grouping.
    computeBudgetByProgram : function() {
-      // load state
       var region = COS.state.currentRegion,
           grouping = COS.state.currentGrouping,
 
@@ -1080,7 +1109,6 @@ COS.Utils =
    },
 
    computeBudgetSpendingByProgram : function() {
-      // load state
       var region = COS.state.currentRegion,
           grouping = COS.state.currentGrouping,
 
@@ -1111,6 +1139,8 @@ COS.Utils =
    }
 };
 
-// Kick off application.
+/*
+ * Kick off application.
+ */
 var mainRoute = new COS.Router();
 Backbone.history.start();
