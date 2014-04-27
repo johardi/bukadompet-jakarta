@@ -733,7 +733,7 @@ COS.Views.Donut = Backbone.View.extend(
          spendingData[1] = row["realisasi"]
       });
       
-      var labels = ["Sisa Anggaran", "Realisasi"];
+      var labels = ["SISA ALOKASI", "REALISASI"];
 
       this.$el.empty();
 
@@ -742,7 +742,7 @@ COS.Views.Donut = Backbone.View.extend(
       var pie = d3.layout.pie().sort(null);
 
       var arc = d3.svg.arc()
-                  .innerRadius(this.radius - 120)
+                  .innerRadius(this.radius - 130)
                   .outerRadius(this.radius - 30);
 
       var svg = d3.select("#budgetDonut").append("svg")
@@ -759,6 +759,7 @@ COS.Views.Donut = Backbone.View.extend(
       var donutPath = donut.selectAll("path")
                   .data(pie(spendingData))
                   .enter().append("path")
+                  .attr("class", "donutSegment")
                   .attr("fill", function(d, i) { return color(i); })
                   .attr("d", arc);
 
@@ -770,10 +771,33 @@ COS.Views.Donut = Backbone.View.extend(
                   .attr("transform", function(d) {return "translate(" + arc.centroid(d) + ")"; })
                   .attr("text-anchor", "middle")
                   .text(function(d, i) { 
-	                 if (d.value !== 0) { 
-	                    return labels[i];
+                     if (d.value !== 0) { 
+                        return labels[i];
                      }
-	              });
+                  });
+
+      var center_group = svg.append("g")
+	      .attr("class", "ctrGroup")
+	      .attr("transform", "translate(" + (this.width / 2) + "," + (this.height / 2) + ")");
+
+      // on mouse over, fade the graphic bar
+	  donutPath.on("mouseover", function(d)
+	  { 
+		 var value = d.value;
+		 $(".donutSegment").stop().fadeTo(300, 0.2);
+         $(this).stop().fadeTo(0, 1.0);
+	     center_group.append("text")
+		     .attr("dy", ".35em").attr("class", "budgetChartLabel")
+		     .attr("text-anchor", "middle")
+		     .text(function(d) { return COS.Utils.toMoney(value.toFixed(0)); });
+	  })
+
+      // on mouse out, unfade all bars.
+      .on("mouseout", function(d)
+      {
+         $(".donutSegment").stop().fadeTo("fast", 1.0);
+         $(".budgetChartLabel").empty();
+      });
 
       // some graceful animation
       this._hideGroup("#budgetDonut");
@@ -826,65 +850,87 @@ COS.Views.StackedBar = Backbone.View.extend(
 
    render : function() 
    {
+       var x = d3.scale.ordinal()
+           .rangeRoundBands([0, this.width - 50], .1);
+
+       var y = d3.scale.linear()
+           .rangeRound([this.height, 0]);
+
+       var color = d3.scale.ordinal()
+           .range(["#1f77b4", "#aec7e8"]);
+   
+       var legends = [ 
+           ["Alokasi Anggaran", "#1f77b4"],
+           ["Realisasi", "#aec7e8"] ];
+       
+       var xAxis = d3.svg.axis()
+           .scale(x)
+           .orient("bottom");
+
+       var yAxis = d3.svg.axis()
+           .scale(y)
+           .orient("left");
+  
       var dataset = COS.Utils.computeBudgetSpendingByProgram();
       var spendingData = [];
 
       dataset.each(function(row, index) {
-         var inner = [];
-         inner[0] = row["namaProgram"],
-         inner[1] = row["nilai"],
-         inner[2] = row["realisasi"],
+         var inner = {
+             "program" : row["namaProgram"],
+             "nilai" : row["nilai"],
+             "realisasi" : row["realisasi"]
+         };
          spendingData[index] = inner
       });
 
-      var remapped = ["Alokasi Anggaran", "Realisasi"].map(function(dat, i) {
-         return spendingData.map(function(d, ii) {
-            return { x: d[0], y: d[i+1], percent: d[i+1] * 100 / (d[1] + d[2]), label: dat };
-         })
+      color.domain(d3.keys(spendingData[0]).filter(function(key) { return key !== "program"; }));
+
+      spendingData.forEach(function(d) {
+         var y0 = 0;
+         d.budget = color.domain().map(function(name) { return {program: d["program"], value: d[name], name: name, y0: y0, y1: y0 += +d[name]}; });
+         d.budget.forEach(function(d) { d.y0 /= y0; d.y1 /= y0; });
       });
 
-      x = d3.scale.ordinal().rangeRoundBands([0, this.width - 50])
-      y = d3.scale.linear().range([0, this.height - 50])
-      z = d3.scale.category20();
-      colors = [ ["Alokasi Anggaran", "#1f77b4"],
-                 ["Realisasi", "#aec7e8"] ];
+      spendingData.sort(function(a, b) { return b.budget[0].y1 - a.budget[0].y1; });
+
+      x.domain(spendingData.map(function(d) { return d.program; }));
 
       this.$el.empty();
-
-      var stacked = d3.layout.stack()(remapped);
-
-      x.domain(stacked[0].map(function(d) { return d.x; }));
-      y.domain([0, d3.max(stacked[stacked.length - 1], function(d) {
-         return d.y0 + d.y;
-      })]);
-
+    
       var svg = d3.select("#budgetBarImg").append("svg")
                   .attr("width", this.width)
                   .attr("height", this.height)
                   .append("g")
-                  .attr("transform", "translate(" + 40 + "," + (this.height - 40) + ")");
+                  .attr("transform", "translate(" + 40 + "," + 20 + ")");
 
-      var valGroup = svg.selectAll("g.valgroup")
-           .data(stacked)
-           .enter().append("g")
-           .attr("class", "valgroup")
-           .style("fill", function(d, i) { return z(i); })
-           .style("stroke", function(d, i) { return d3.rgb(z(i)).darker(); });
-      
-      var rect = valGroup.selectAll("rect")
-           .data(function(d) { return d; })
-           .enter().append("rect")
-           .attr("class", "bar")
-           .attr("x", function(d) { return x(d.x); })
-           .attr("y", function(d) { return -y(d.y0) - y(d.y); })
-           .attr("height", function(d) { return y(d.y); })
-           .attr("width", x.rangeBand());           
+      svg.append("g")
+         .attr("class", "x axis")
+         .attr("transform", "translate(0," + this.height + ")")
+         .call(xAxis);
+
+      svg.append("g")
+         .attr("class", "y axis")
+         .call(yAxis);
+    
+      var state = svg.selectAll(".program")
+          .data(spendingData)
+          .enter().append("g")
+          .attr("class", "program")
+          .attr("transform", function(d) { return "translate(" + x(d.program) + ", 0)"; });
+
+      var rect = state.selectAll("rect")
+          .data(function(d) { return d.budget; })
+          .enter().append("rect")
+          .attr("class", "bar")
+          .attr("y", function(d) { return y(d.y1); })
+          .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+          .attr("width", d3.min([100, x.rangeBand()]))  
+          .style("fill", function(d) { return color(d.name); });
 
       // on mouse over, fade the graphic bar
       rect.on("mouseover", function(d)
       {
-        console.log(d);
-         COS.app.views.budgetBarTitle.update(COS.Utils.toTitleCase(d.x) + " - " + COS.Utils.toMoney(d.y.toFixed(0)));
+         COS.app.views.budgetBarTitle.update(COS.Utils.toTitleCase(d.program) + " - " + COS.Utils.toMoney(d.value.toFixed(0)));
          $(".bar").stop().fadeTo(300, 0.2);
          $(this).stop().fadeTo(0, 1.0);
       })
@@ -894,44 +940,51 @@ COS.Views.StackedBar = Backbone.View.extend(
       {
          $(".bar").stop().fadeTo("fast", 1.0);
          COS.app.views.title.update();
-      })
-      .append("p")
- 
-      var legend = svg.append("g")
-            .attr("class", "barLegend")
-            .attr("height", 100)
-            .attr("width", 100)
-            .attr("transform", "translate(" + -150 + "," + (-this.height + 50) + ")");
+      });
 
-      var legendRect = legend.selectAll('rect').data(colors);
-
-      legendRect.enter()
-          .append("rect")
-          .attr("x", this.width - 65)
-          .attr("width", 10)
-          .attr("height", 10);
-    
-      legendRect
-          .attr("y", function(d, i) {
-             return i * 20;
-          })
-          .style("fill", function(d) {
-             return d[1];
-          });
-
-      var legendText = legend.selectAll('text').data(colors);
-
-      legendText.enter()
-          .append("text")
-          .attr("x", this.width - 52);
-
-      legendText
-          .attr("y", function(d, i) {
-             return i * 20 + 9;
-          })
-          .text(function(d) {
-             return d[0];
-          });
+      svg.append("line")
+         .attr("x1", 0)
+         .attr("y1", this.height / 2)
+         .attr("x2", this.width)
+         .attr("y2", this.height / 2)
+         .attr("stroke-width", 2)
+         .attr("stroke", "red");
+      
+       var legend = svg.append("g")
+             .attr("class", "barLegend")
+             .attr("height", 100)
+             .attr("width", 100)
+             .attr("transform", "translate(" + -150 + "," + (-this.height + 50) + ")");
+      
+       var legendRect = legend.selectAll('rect').data(legends);
+      
+       legendRect.enter()
+           .append("rect")
+           .attr("x", this.width - 65)
+           .attr("width", 10)
+           .attr("height", 10);
+          
+       legendRect
+           .attr("y", function(d, i) {
+              return i * 20;
+           })
+           .style("fill", function(d) {
+              return d[1];
+           });
+      
+       var legendText = legend.selectAll('text').data(legends);
+      
+       legendText.enter()
+           .append("text")
+           .attr("x", this.width - 52);
+      
+       legendText
+           .attr("y", function(d, i) {
+              return i * 20 + 9;
+           })
+           .text(function(d) {
+              return d[0];
+           });
 
       // some graceful animation
       this._hideGroup("#budgetBarImg");
@@ -946,8 +999,8 @@ COS.Utils =
    createDataset : function(sector, year) {
       return new Miso.Dataset(
       {
-         // url : "data/apbd-jakarta.json",
-         url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
+         url : "data/data24.json",
+         // url : COS.endpointUrl + "&urusan=" + sector + "&year=" + year + "&per_page=250",
          columns : COS.columns,
          parser : COS.ResultParser,
       });

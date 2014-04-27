@@ -49,36 +49,50 @@ a {
   margin: 0 auto;
 }
 
+.budgetChartLabel {
+  font-size: 22px;
+  font-family: Georgia;
+}
+
 #budgetDonut {
-  width: 40%;
-  height: 50%;
+  width: 38%;
+  height: 55%;
   margin: 0 auto;
   float: left;
 }
 
 #budgetBar {
-  width: 60%;
-  height: 50%;
+  width: 62%;
+  height: 55%;
   margin: 0 auto;
   float: left;
 }
 
+#budgetBarDescription {
+  width: 90%;
+  height: 8%;
+  font-size: 14px;
+  font-family: Georgia; 
+  padding-bottom: 10px;
+}
+
 #budgetBarImg {
   width: 90%;
-  height: 95%;
+  height: 85%;
 }
 
 #budgetBarTitle {
   font-size: 24px;
   font-family: Georgia;
-  padding-left: 30px;
-  width: 100%;
-  height: 5%;
+  padding-top: 15px;
+  padding-left: 35px;
+  width: 85%;
+  height: 7%;
 }
 
 .barLegend {
   font-size: 16px;
-  font-family: Georgia;	
+  font-family: Georgia; 
 }
 
 .donutLabel {
@@ -91,7 +105,7 @@ a {
   line-height: 90%;
   margin: .2em 0 .4em 0;
   letter-spacing: -2px;
-  float: left;	
+  float: left;  
 }
 
 #regionSelection {
@@ -100,7 +114,7 @@ a {
 }
 
 #region {
-  width: 150px;	
+  width: 150px; 
 }
 
 #sectorSelection {
@@ -109,7 +123,7 @@ a {
 }
 
 #sector {
-  width: 320px;	
+  width: 320px; 
 }
 
 #yearPeriod {
@@ -118,7 +132,7 @@ a {
 }
 
 #year {
-  width: 80px;	
+  width: 80px;  
 }
 
 .cell {
@@ -149,6 +163,13 @@ a {
   padding-bottom: 3px;
   display: block;
   width: 100%;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 /* Select options */

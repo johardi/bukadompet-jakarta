@@ -22,6 +22,7 @@
         $('#fullpage').fullpage({
             slidesColor: ['#7BAABE', '#4BBFC3'],
             anchors: ['utama', 'realisasi'],
+            navigation: true,
             scrollOverflow: true
          });
       });
@@ -75,6 +76,12 @@
     <div id="realisasi" class="section">
       <div id="budgetDonut"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
       <div id="budgetBar">
+		  <div id="budgetBarDescription">
+		     <p>Garis merah di grafik merupakan garis kontrol dimana apabila diagram alokasi anggaran (berwarna biru
+			    gelap) berada diatas garis maka terdapat sisa anggaran. Tetapi sebaliknya dibawah garis maka telah
+			    terjadi over-budgeting. Kondisi alokasi anggaran sesuai dengan realisasi adalah ketika diagram
+			    berada tepat di garis kontrol.</p>
+		  </div>
 	     <div id="budgetBarImg"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
 	     <div id="budgetBarTitle"></div>
 	  </div>
