@@ -33,7 +33,7 @@
   <!-- Menu Header -->
   <div id="header">
     <div class="pageTitle">BukaDompet.Jakarta</div>
-  	  <div id="displayOptions">
+      <div id="displayOptions">
         <div id="yearPeriod">
           <select data-placeholder="Pilih Tahun..." class="chosen-select" id="year" tabindex="-1">
           <script type="text/template" id="yearPeriod">
@@ -76,15 +76,15 @@
     <div id="realisasi" class="section">
       <div id="budgetDonut"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
       <div id="budgetBar">
-		  <div id="budgetBarDescription">
-		     <p>Garis merah di grafik merupakan garis kontrol dimana apabila diagram alokasi anggaran (berwarna biru
-			    gelap) berada diatas garis maka terdapat sisa anggaran. Tetapi sebaliknya dibawah garis maka telah
-			    terjadi over-budgeting. Kondisi alokasi anggaran sesuai dengan realisasi adalah ketika diagram
-			    berada tepat di garis kontrol.</p>
-		  </div>
-	     <div id="budgetBarImg"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
-	     <div id="budgetBarTitle"></div>
-	  </div>
+          <div id="budgetBarDescription">
+             <p>Garis merah di grafik merupakan GARIS KONTROL dimana apabila besaran alokasi anggaran (warna biru
+                gelap) berada di atas garis maka akan terdapat sisa anggaran. Tetapi sebaliknya apabila di bawah
+                garis maka dana realisasi telah melebihi anggaran. Kondisi anggaran yang seimbang adalah ketika
+                diagram berada tepat di garis kontrol.</p>
+          </div>
+         <div id="budgetBarImg"><i id="spinner" class="fa fa-refresh fa-spin fa-3x"></i></div>
+         <div id="budgetBarTitle"></div>
+      </div>
     </div>
   </div>
 
@@ -100,9 +100,9 @@
   <script type="text/javascript" src="js/accounting.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
   <script type="text/javascript">
-	if (!('ontouchstart' in document.documentElement)) {
+    if (!('ontouchstart' in document.documentElement)) {
        $('.chosen-select').chosen();
-	}    
+    }    
   </script>
   </body>
 </html>
